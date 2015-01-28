@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ae:configurations xmlns="http://agavi.org/agavi/config/parts/autoload/1.0" xmlns:ae="http://agavi.org/agavi/config/global/envelope/1.0">
+	
+	<ae:configuration>
+		
+		<autoload name="ShoppingwithfriendsUsersBaseAction">%core.module_dir%/Users/lib/action/ShoppingwithfriendsUsersBaseAction.class.php</autoload>
+		<autoload name="ShoppingwithfriendsUsersBaseModel">%core.module_dir%/Users/lib/model/ShoppingwithfriendsUsersBaseModel.class.php</autoload>
+		<autoload name="ShoppingwithfriendsUsersBaseView">%core.module_dir%/Users/lib/view/ShoppingwithfriendsUsersBaseView.class.php</autoload>
+		
+	</ae:configuration>
+	
+</ae:configurations>

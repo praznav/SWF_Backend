@@ -1,0 +1,26 @@
+#!/bin/bash
+# Does a full propel rebuild, including reversing the MySQL schema
+
+# Remove the old schema
+echo "Attempting to remove old schema"
+if [ -f schema.xml ];
+then
+  rm -f schema.xml
+  echo "old schema removed"
+fi
+
+# Reverse the MySQL schema
+echo "Reversing MySQL schema..."
+./bin/propel reverse 'mysql:host=localhost;dbname=shopping_with_friends;user=s_w_f_user;password=KevinKevinCS2340P@$$w0rd' --output-dir . --verbose
+
+# Edit the schema file to rename the databse
+echo "Renaming datasource in MySQL schema..."
+perl -pi -e 's/name=\"default\"/name=\"ShoppingWithFriends\"/g' schema.xml
+
+# Clean the built classes folder
+echo "Cleaning build/classes/ folder..."
+rm -rf ./build/classes/
+
+# Rebuild the model
+echo "Rebuilding the model..."
+./bin/propel model:build --output-dir ./build/classes

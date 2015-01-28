@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ae:configurations xmlns="http://agavi.org/agavi/config/parts/autoload/1.0" xmlns:ae="http://agavi.org/agavi/config/global/envelope/1.0" parent="%core.system_config_dir%/autoload.xml">
+	
+	<ae:configuration>
+		
+		<autoload name="ShoppingwithfriendsBaseAction">%core.lib_dir%/action/ShoppingwithfriendsBaseAction.class.php</autoload>
+		<autoload name="ShoppingwithfriendsBaseModel">%core.lib_dir%/model/ShoppingwithfriendsBaseModel.class.php</autoload>
+		<autoload name="ShoppingwithfriendsBaseView">%core.lib_dir%/view/ShoppingwithfriendsBaseView.class.php</autoload>
+
+		<autoload name="Friendship">%core.lib_dir%/propel/build/classes/Friendship.php</autoload>
+		<autoload name="Base\Friendship">%core.lib_dir%/propel/build/classes/Base/Friendship.php</autoload>
+		<autoload name="Map\FriendshipTableMap">%core.lib_dir%/propel/build/classes/Map/FriendshipTableMap.php</autoload>
+
+		<autoload name="FriendshipQuery">%core.lib_dir%/propel/build/classes/FriendshipQuery.php</autoload>
+		<autoload name="Base\FriendshipQuery">%core.lib_dir%/propel/build/classes/Base/FriendshipQuery.php</autoload>
+
+		<autoload name="PrivilegeType">%core.lib_dir%/propel/build/classes/PrivilegeType.php</autoload>
+		<autoload name="Base\PrivilegeType">%core.lib_dir%/propel/build/classes/Base/PrivilegeType.php</autoload>
+		<autoload name="Map\PrivilegeTypeTableMap">%core.lib_dir%/propel/build/classes/Map/PrivilegeTypeTableMap.php</autoload>
+
+		<autoload name="PrivelegeTypeQuery">%core.lib_dir%/propel/build/classes/PrivilegeTypeQuery.php</autoload>
+		<autoload name="Base\PrivelegeTypeQuery">%core.lib_dir%/propel/build/classes/Base/PrivilegeTypeQuery.php</autoload>
+
+		<autoload name="Product">%core.lib_dir%/propel/build/classes/Product.php</autoload>
+		<autoload name="Base\Product">%core.lib_dir%/propel/build/classes/Base/Product.php</autoload>
+		<autoload name="Map\ProductTableMap">%core.lib_dir%/propel/build/classes/Map/ProductTableMap.php</autoload>
+
+		<autoload name="ProductQuery">%core.lib_dir%/propel/build/classes/ProductQuery.php</autoload>
+		<autoload name="Base\ProductQuery">%core.lib_dir%/propel/build/classes/Base/ProductQuery.php</autoload>
+
+		<autoload name="ProductWishlistEntry">%core.lib_dir%/propel/build/classes/ProductWishlistEntry.php</autoload>
+		<autoload name="Base\ProductWishlistEntry">%core.lib_dir%/propel/build/classes/Base/ProductWishlistEntry.php</autoload>
+		<autoload name="Map\ProductWishlistEntryTableMap">%core.lib_dir%/propel/build/classes/Map/ProductWishlistEntryTableMap.php</autoload>
+
+		<autoload name="ProductWishlistEntryQuery">%core.lib_dir%/propel/build/classes/ProductWishlistEntryQuery.php</autoload>
+		<autoload name="Base\ProductWishlistEntryQuery">%core.lib_dir%/propel/build/classes/Base/ProductWishlistEntryQuery.php</autoload>
+
+		<autoload name="User">%core.lib_dir%/propel/build/classes/User.php</autoload>
+		<autoload name="Base\User">%core.lib_dir%/propel/build/classes/Base/User.php</autoload>
+		<autoload name="Map\UserTableMap">%core.lib_dir%/propel/build/classes/Map/UserTableMap.php</autoload>
+
+		<autoload name="UserQuery">%core.lib_dir%/propel/build/classes/UserQuery.php</autoload>
+		<autoload name="Base\UserQuery">%core.lib_dir%/propel/build/classes/Base/UserQuery.php</autoload>
+		
+	</ae:configuration>
+	
+</ae:configurations>
