@@ -2,18 +2,20 @@
 <ae:configurations xmlns:ae="http://agavi.org/agavi/config/global/envelope/1.0" xmlns="http://agavi.org/agavi/config/parts/databases/1.0">
 	
 	<ae:configuration>
-		<databases default="pdo_mysql_main">
-			
-			<database name="pdo_mysql_main" class="AgaviPdoDatabase">
-				<ae:parameter name="dsn">mysql:host=localhost;dbname=agsmplapp</ae:parameter>
-				<ae:parameter name="username">root</ae:parameter>
-				<ae:parameter name="password"></ae:parameter>
+		<databases default="propel">
+			<database name="propel" class="AgaviPropelDatabase">
+				<ae:parameter name="config">%core.lib_dir%/propel/build/conf/config.php</ae:parameter>
+                <ae:parameter name="connection">
+                    <ae:parameter name="dsn">mysql:dbname=shopping_with_friends;host=localhost</ae:parameter>
+                    <ae:parameter name="user">s_w_f_user</ae:parameter>
+                    <ae:parameter name="password">KevinKevinCS2340P@$$w0rd</ae:parameter>
+                    <ae:parameter name="settings">
+                        <ae:parameter name="charset">
+                            <ae:parameter name="value">utf8</ae:parameter>
+                        </ae:parameter>
+                    <ae:parameter>
+				</ae:parameter>
 			</database>
-			
-			<database name="propelom" class="AgaviPropelDatabase">
-				<ae:parameter name="config">%core.app_dir%/config/project-conf.php</ae:parameter>
-			</database>
-			
 		</databases>
 	</ae:configuration>
 	

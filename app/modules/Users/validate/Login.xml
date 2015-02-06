@@ -8,6 +8,23 @@
 	<ae:configuration>
 		
 		<validators>
+            <validator class="Users_UsernameValidator" name="username">
+                <arguments>
+                    <argument>username</argument>
+                </arguments>
+                <errors>
+                    <error>The parameter must contain a valid username</error>
+                </errors>
+            </validator>
+            <validator class="Users_PasswordValidator" name="password">
+                <arguments>
+                    <argument>password</argument>
+                </arguments>
+                <errors>
+                    <error>The parameter must contain a valid password</error>
+                </errors>
+            </validator>
+
 		</validators>
 		
 	</ae:configuration>

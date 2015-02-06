@@ -18,6 +18,35 @@ class Users_LoginAction extends ShoppingwithfriendsUsersBaseAction
 	{
 		return 'Success';
 	}
+
+	public function executeRead(AgaviRequestDataHolder $rd)
+	{
+        $username = $rd->getParameter('username');
+        $password = $rd->getParameter('password');
+        $userManager = $this->getContext()->getModel('UserManager', 'Users');
+        if (!isset($userManager))
+        {
+            return 'Error';
+        }
+
+        $authenticationStatus = $userManager->authenticate($username, $password);
+        if ($authenticationStatus == 0)
+        {
+            return 'Success';
+        }
+        else if ($authenticationStatus == 1)
+        {
+            return 'IncorrectLogin';
+        }
+        else if ($authenticationStatus == 2)
+        {
+            return 'AccountLocked';
+        }
+        else
+        {
+            return 'Error';
+        }
+	}
 }
 
 ?>

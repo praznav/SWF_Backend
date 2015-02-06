@@ -41,8 +41,8 @@
 			<setting name="available">true</setting>
 			<setting name="debug">false</setting>
 			
-			<setting name="use_database">false</setting>
-			<setting name="use_logging">false</setting>
+			<setting name="use_database">true</setting>
+			<setting name="use_logging">true</setting>
 			<setting name="use_security">true</setting>
 			<setting name="use_translation">false</setting>
 		</settings>
@@ -61,6 +61,7 @@
 	<ae:configuration environment="development.*">
 		<settings>
 			<setting name="debug">true</setting>
+            <setting name="use_database">true</setting>
 		</settings>
 	</ae:configuration>
 	

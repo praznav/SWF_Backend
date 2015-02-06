@@ -26,7 +26,7 @@ $connection = array (
                     'adapter' => 'mysql',
                     'connection' =>
                         array (
-                            'dsn' => 'mysql:dbname=shopping_with_friends',
+                            'dsn' => 'mysql:host=localhost;dbname=shopping_with_friends',
                             'user' => 's_w_f_user',
                             'password' => 'KevinKevinCS2340P@$$w0rd',
                 ),

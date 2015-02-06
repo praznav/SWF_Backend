@@ -7,7 +7,7 @@
         <connection>
           <dsn>mysql:host=localhost;dbname=shopping_with_friends</dsn>
           <user>s_w_f_user</user>
-          <password>KevinKevin2340P@$$w0rd</password>
+          <password>KevinKevinCS2340P@$$w0rd</password>
         </connection>
       </datasource>
     </datasources>
