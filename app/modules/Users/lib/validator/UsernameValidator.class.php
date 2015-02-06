@@ -5,7 +5,6 @@ class Users_UsernameValidator extends AgaviValidator
     protected function validate()
     {
         $username = $this->getData('username');
-        error_log("Got username of: $username");
         if (!isset($username))
         {
             return false;
