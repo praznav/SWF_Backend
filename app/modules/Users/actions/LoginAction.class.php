@@ -47,6 +47,34 @@ class Users_LoginAction extends ShoppingwithfriendsUsersBaseAction
             return 'Error';
         }
 	}
+
+    public function handleReadError(AgaviRequestDataHolder $rd)
+    {
+        // Check for validation errors
+        $report = $this->getContainer()->getValidationManager()->getReport();
+        if ($report->byArgument('username')->has())
+        {
+            error_log("A validation error ocurred for username in Users.Login:");
+            foreach ($report->byArgument('username')->getErrors() as $error)
+            {
+                error_log("  - " . $error->getMessage());
+            }
+            return 'IncorrectLogin';
+        }
+        if ($report->byArgument('password')->has())
+        {
+            error_log("A validation error ocurred for password in Users.Login:");
+            foreach ($report->byArgument('username')->getErrors() as $error)
+            {
+                error_log("  - " . $error->getMessage());
+            }
+
+            return 'IncorrectLogin';
+        }
+
+        // An unkown validation error ocurred, return a general server error
+        return 'Error';
+    }
 }
 
 ?>

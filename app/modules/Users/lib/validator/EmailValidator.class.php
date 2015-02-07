@@ -1,35 +1,35 @@
 <?php
 
-class Users_UsernameValidator extends AgaviValidator
+class Users_EmailValidator extends AgaviValidator
 {
     protected function validate()
     {
-        $username = $this->getData($this->getArgument());
-        if (!isset($username))
+        $email = $this->getData($this->getArgument());
+        if (!isset($email))
         {
             $this->throwError('not_set');
             return false;
         }
 
-        if (strlen($username) < 4)
+        if (strlen($email) < 5)
         {
             $this->throwError('too_short');
             return false;
         }
 
-        if (strlen($username) > 25)
+        if (strlen($email) > 50)
         {
             $this->throwError('too_long');
             return false;
         }
 
-        if (preg_match('/[^A-Za-z0-9.\\-$]/', $username))
+        if (!filter_var($email, FILTER_VALIDATE_EMAIL))
         {
             $this->throwError('invalid_character');
             return false;
         }
 
-        $this->export($username);
+        $this->export($email);
         return true;
     }
 }

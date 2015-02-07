@@ -11,7 +11,7 @@ class Users_LoginSuccessView extends ShoppingwithfriendsUsersBaseView
 
     public function executeXml(AgaviRequestDataHolder $rd)
     {
-        // Create the xml response saying that there was an incorrect username or password
+        // Create the xml response indicating success
         $xml = new DomDocument('1.0', 'utf-8');
         $xml->formatOutput = true;
         $root = $xml->createElement("response");
