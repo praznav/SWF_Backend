@@ -13,7 +13,7 @@
                     <argument>username</argument>
                 </arguments>
                 <errors>
-                    <error>An unknown error ocurred.</error>
+                    <error>You must enter a username.</error>
                     <error for="not_set">You must enter a username.</error>
                     <error for="too_short">Your username must be at least 4 characters long.</error>
                     <error for="too_long">Your username cannot be longer than 25 characters.</error>
@@ -25,7 +25,7 @@
                     <argument>email</argument>
                 </arguments>
                 <errors>
-                    <error>An unknown error ocurred.</error>
+                    <error>You must enter an email.</error>
                     <error for="not_set">You must enter an email.</error>
                     <error for="too_short">Your email must be at least 5 characters long.</error>
                     <error for="too_long">Your email cannot be longer than 50 characters.</error>
@@ -37,7 +37,7 @@
                     <argument>password</argument>
                 </arguments>
                 <errors>
-                    <error>An unknown error ocurred.</error>
+                    <error>You must enter a password.</error>
                     <error for="not_set">You must enter a password.</error>
                     <error for="too_short">Your password must be at least 5 characters long.</error>
                     <error for="too_long">Your password cannot be longer than 50 characters.</error>
@@ -48,7 +48,7 @@
                     <argument>firstName</argument>
                 </arguments>
                 <errors>
-                    <error>An unknown error ocurred.</error>
+                    <error>You must enter a first name.</error>
                     <error for="not_set">You must enter a first name.</error>
                     <error for="too_short">Your first name must be at least 2 characters long.</error>
                     <error for="too_long">Your first name cannot be longer than 25 characters.</error>
@@ -60,7 +60,7 @@
                     <argument>lastName</argument>
                 </arguments>
                 <errors>
-                    <error>An unknown error ocurred.</error>
+                    <error>You must enter a last name.</error>
                     <error for="not_set">You must enter a last name.</error>
                     <error for="too_short">Your last name must be at least 2 characters long.</error>
                     <error for="too_long">Your last name cannot be longer than 25 characters.</error>

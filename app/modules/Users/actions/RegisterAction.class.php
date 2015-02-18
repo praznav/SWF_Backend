@@ -49,6 +49,7 @@ class Users_RegisterAction extends ShoppingwithfriendsUsersBaseAction
 
     public function handleWriteError(AgaviRequestDataHolder $rd)
     {
+        error_log("Handling write errors for register");
         // Check for validation errors and add them to an array
         $report = $this->getContainer()->getValidationManager()->getReport();
         $errors = array();
@@ -80,7 +81,7 @@ class Users_RegisterAction extends ShoppingwithfriendsUsersBaseAction
             {
                 array_push($emailErrors, $error->getMessage());
             }
-            $errors['emailErrors'] = $usernameErrors;
+            $errors['emailErrors'] = $emailErrors;
         }
         if ($report->byArgument('firstName')->has())
         {
@@ -92,7 +93,7 @@ class Users_RegisterAction extends ShoppingwithfriendsUsersBaseAction
             }
             $errors['firstNameErrors'] = $firstNameErrors;
         }
-        if ($report->byArgument('lastNameErrors')->has())
+        if ($report->byArgument('lastName')->has())
         {
             error_log("report contains errors for last name");
             $lastNameErrors = array();
@@ -100,7 +101,7 @@ class Users_RegisterAction extends ShoppingwithfriendsUsersBaseAction
             {
                 array_push($lastNameErrors, $error->getMessage());
             }
-            $errors['lastNameErrors'] = $usernameErrors;
+            $errors['lastNameErrors'] = $lastNameErrors;
         }
         $this->setAttribute('errors', $errors);
         return 'Invalid';
