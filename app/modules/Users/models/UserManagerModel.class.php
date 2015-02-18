@@ -5,7 +5,7 @@ class Users_UserManagerModel extends ShoppingwithfriendsUsersBaseModel
     /**
      * 0 - Login successful
      * 1 - Username or password incorrect
-     * 2 - Accoutn locked
+     * 2 - Account locked
      */
     public function authenticate($username, $password)
     {
@@ -53,6 +53,39 @@ class Users_UserManagerModel extends ShoppingwithfriendsUsersBaseModel
         $user->setIncorrectLoginAttempts($user->getIncorrectLoginAttempts() + 1);
         $user->save();
         return 1;
+    }
+
+    /**
+     * 0 - Registration successful
+     * 1 - Username already taken
+     * 2 - Error
+     */
+    public function registerUser($username, $password, $email, $firstName, $lastName)
+    {
+        // Make sure all of the variables necessary to register a user are set
+        if (!isset($username) || !isset($password) || !isset($email) || !isset($firstName) || !isset($lastName))
+        {
+            return 2;
+        }
+
+        // See if the username is taken before we register the user
+        $existingUser = UserQuery::create()->findOneByUsername($username);
+
+        // If we found a user, then the username is taken
+        if (isset($existingUser))
+        {
+            return 1;
+        }
+
+        $newUser = new User();
+        $newUser->setUsername($username);
+        $newUser->setPassword($password);
+        $newUser->setEmail($email);
+        $newUser->setFirstName($firstName);
+        $newUser->setLastName($lastName);
+        $newUser->save();
+
+        return 0;
     }
 }
 

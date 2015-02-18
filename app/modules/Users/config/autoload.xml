@@ -8,6 +8,8 @@
 		<autoload name="ShoppingwithfriendsUsersBaseView">%core.module_dir%/Users/lib/view/ShoppingwithfriendsUsersBaseView.class.php</autoload>
         <autoload name="Users_UsernameValidator">%core.module_dir%/Users/lib/validator/UsernameValidator.class.php</autoload>
         <autoload name="Users_PasswordValidator">%core.module_dir%/Users/lib/validator/PasswordValidator.class.php</autoload>
+        <autoload name="Users_NameValidator">%core.module_dir%/Users/lib/validator/NameValidator.class.php</autoload>
+        <autoload name="Users_EmailValidator">%core.module_dir%/Users/lib/validator/EmailValidator.class.php</autoload>
 		
 	</ae:configuration>
 	

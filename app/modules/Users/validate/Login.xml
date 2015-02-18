@@ -13,7 +13,11 @@
                     <argument>username</argument>
                 </arguments>
                 <errors>
-                    <error>The parameter must contain a valid username</error>
+                    <error>An unknown error ocurred.</error>
+                    <error for="not_set">You must enter a username.</error>
+                    <error for="too_short">Your username must be at least 4 characters long.</error>
+                    <error for="too_long">Your username cannot be longer than 25 characters.</error>
+                    <error for="invalid_character">Your username contains invalid characters. The only allowed characters are A-Z, a-z, periods and dashes.</error>
                 </errors>
             </validator>
             <validator class="Users_PasswordValidator" name="password">
@@ -21,7 +25,10 @@
                     <argument>password</argument>
                 </arguments>
                 <errors>
-                    <error>The parameter must contain a valid password</error>
+                    <error>An unknown error ocurred.</error>
+                    <error for="not_set">You must enter a password.</error>
+                    <error for="too_short">Your password must be at least 5 characters long.</error>
+                    <error for="too_long">Your password cannot be longer than 50 characters.</error>
                 </errors>
             </validator>
 

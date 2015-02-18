@@ -8,6 +8,7 @@
 			<route name="index" pattern="^/$" module="%actions.default_module%" action="%actions.default_action%" />
 			<route name="Users" pattern="^/Users" module="Users">
 				<route name=".Login" pattern="^/Login$" action="Login" output_type="xml" />
+                <route name=".Register" pattern="^/Register$" action="Register" output_type="xml" />
 			</route>
         
         </routes>
