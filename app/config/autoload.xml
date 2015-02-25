@@ -35,6 +35,20 @@
 		<autoload name="ProductWishlistEntryQuery">%core.lib_dir%/propel/build/classes/ProductWishlistEntryQuery.php</autoload>
 		<autoload name="Base\ProductWishlistEntryQuery">%core.lib_dir%/propel/build/classes/Base/ProductWishlistEntryQuery.php</autoload>
 
+        <autoload name="Sale">%core.lib_dir%/propel/build/classes/Sale.php</autoload>
+        <autoload name="Base\Sale">%core.lib_dir%/propel/build/classes/Base/Sale.php</autoload>
+        <autoload name="Map\SaleTableMap">%core.lib_dir%/propel/build/classes/Map/SaleTableMap.php</autoload>
+
+        <autoload name="SaleQuery">%core.lib_dir%/propel/build/classes/SaleQuery.php</autoload>
+        <autoload name="Base\SaleQuery">%core.lib_dir%/propel/build/classes/Base/SaleQuery.php</autoload>
+
+        <autoload name="SaleRating">%core.lib_dir%/propel/build/classes/SaleRating.php</autoload>
+        <autoload name="Base\SaleRating">%core.lib_dir%/propel/build/classes/Base/SaleRating.php</autoload>
+        <autoload name="Map\SaleRatingTableMap">%core.lib_dir%/propel/build/classes/Map/SaleRatingTableMap.php</autoload>
+
+        <autoload name="SaleRatingQuery">%core.lib_dir%/propel/build/classes/SaleRatingQuery.php</autoload>
+        <autoload name="Base\SaleRatingQuery">%core.lib_dir%/propel/build/classes/Base/SaleRatingQuery.php</autoload>
+
 		<autoload name="User">%core.lib_dir%/propel/build/classes/User.php</autoload>
 		<autoload name="Base\User">%core.lib_dir%/propel/build/classes/Base/User.php</autoload>
 		<autoload name="Map\UserTableMap">%core.lib_dir%/propel/build/classes/Map/UserTableMap.php</autoload>

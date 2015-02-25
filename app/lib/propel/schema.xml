@@ -2,9 +2,7 @@
 <database name="ShoppingWithFriends" defaultIdMethod="native" defaultPhpNamingMethod="underscore">
   <table name="friendship" idMethod="native" phpName="Friendship">
     <column name="friendship_id" phpName="FriendshipId" type="BIGINT" sqlType="bigint(20) unsigned" primaryKey="true" autoIncrement="true" required="true"/>
-    <column name="friendship_status" phpName="FriendshipStatus" type="TINYINT" required="true" defaultValue="0"/>
     <column name="invite_date" phpName="InviteDate" type="TIMESTAMP" required="true"/>
-    <column name="acceptance_date" phpName="AcceptanceDate" type="TIMESTAMP"/>
     <column name="friend1" phpName="Friend1" type="BIGINT" sqlType="bigint(20) unsigned"/>
     <column name="friend2" phpName="Friend2" type="BIGINT" sqlType="bigint(20) unsigned"/>
     <foreign-key foreignTable="user" name="user_friend2_relationship">
@@ -58,13 +56,63 @@
       <parameter name="Engine" value="InnoDB"/>
     </vendor>
   </table>
+  <table name="sale" idMethod="native" phpName="Sale">
+    <column name="sale_id" phpName="SaleId" type="BIGINT" sqlType="bigint(20) unsigned" primaryKey="true" autoIncrement="true" required="true"/>
+    <column name="location" phpName="Location" type="VARCHAR" size="50" required="true"/>
+    <column name="user_id" phpName="UserId" type="BIGINT" sqlType="bigint(20) unsigned"/>
+    <column name="product_id" phpName="ProductId" type="BIGINT" sqlType="bigint(20) unsigned"/>
+    <foreign-key foreignTable="product" name="product_sale_relationship">
+      <reference local="product_id" foreign="product_id"/>
+    </foreign-key>
+    <foreign-key foreignTable="user" name="user_sale_relationship">
+      <reference local="user_id" foreign="user_id"/>
+    </foreign-key>
+    <index name="IX_user_id">
+      <index-column name="user_id"/>
+    </index>
+    <index name="IX_product_id">
+      <index-column name="product_id"/>
+    </index>
+    <vendor type="mysql">
+      <parameter name="Engine" value="InnoDB"/>
+    </vendor>
+  </table>
+  <table name="sale_rating" idMethod="native" phpName="SaleRating">
+    <column name="sale_rating_id" phpName="SaleRatingId" type="BIGINT" sqlType="bigint(20) unsigned" primaryKey="true" autoIncrement="true" required="true"/>
+    <column name="rating" phpName="Rating" type="TINYINT" required="true"/>
+    <column name="message" phpName="Message" type="VARCHAR" size="255"/>
+    <column name="sale_id" phpName="SaleId" type="BIGINT" sqlType="bigint(20) unsigned"/>
+    <column name="rating_user_id" phpName="RatingUserId" type="BIGINT" sqlType="bigint(20) unsigned"/>
+    <column name="posting_user_id" phpName="PostingUserId" type="BIGINT" sqlType="bigint(20) unsigned"/>
+    <foreign-key foreignTable="user" name="posting_user_sale_rating_relationship">
+      <reference local="posting_user_id" foreign="user_id"/>
+    </foreign-key>
+    <foreign-key foreignTable="sale" name="product_product_sale_relationship">
+      <reference local="sale_id" foreign="sale_id"/>
+    </foreign-key>
+    <foreign-key foreignTable="user" name="rating_user_sale_rating_relationship">
+      <reference local="rating_user_id" foreign="user_id"/>
+    </foreign-key>
+    <index name="IX_sale_id">
+      <index-column name="sale_id"/>
+    </index>
+    <index name="IX_rating_user_id">
+      <index-column name="rating_user_id"/>
+    </index>
+    <index name="IX_posting_user_id">
+      <index-column name="posting_user_id"/>
+    </index>
+    <vendor type="mysql">
+      <parameter name="Engine" value="InnoDB"/>
+    </vendor>
+  </table>
   <table name="user" idMethod="native" phpName="User">
     <column name="user_id" phpName="UserId" type="BIGINT" sqlType="bigint(20) unsigned" primaryKey="true" autoIncrement="true" required="true"/>
     <column name="username" phpName="Username" type="VARCHAR" size="25" required="true"/>
     <column name="password" phpName="Password" type="VARCHAR" size="50" required="true"/>
     <column name="email" phpName="Email" type="VARCHAR" size="50"/>
     <column name="first_name" phpName="FirstName" type="VARCHAR" size="25"/>
-    <column name="last_name" phpName="LastName" type="VARCHAR" size="25" sqlType="varbinary(25)"/>
+    <column name="last_name" phpName="LastName" type="VARCHAR" size="25"/>
     <column name="last_successful_login" phpName="LastSuccessfulLogin" type="TIMESTAMP"/>
     <column name="incorrect_login_attempts" phpName="IncorrectLoginAttempts" type="TINYINT"/>
     <column name="privelege_type_id" phpName="PrivelegeTypeId" type="TINYINT" size="3" sqlType="tinyint(3) unsigned"/>

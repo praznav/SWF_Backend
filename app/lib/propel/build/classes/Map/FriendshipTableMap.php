@@ -59,7 +59,7 @@ class FriendshipTableMap extends TableMap
     /**
      * The total number of columns
      */
-    const NUM_COLUMNS = 6;
+    const NUM_COLUMNS = 4;
 
     /**
      * The number of lazy-loaded columns
@@ -69,7 +69,7 @@ class FriendshipTableMap extends TableMap
     /**
      * The number of columns to hydrate (NUM_COLUMNS - NUM_LAZY_LOAD_COLUMNS)
      */
-    const NUM_HYDRATE_COLUMNS = 6;
+    const NUM_HYDRATE_COLUMNS = 4;
 
     /**
      * the column name for the FRIENDSHIP_ID field
@@ -77,19 +77,9 @@ class FriendshipTableMap extends TableMap
     const COL_FRIENDSHIP_ID = 'friendship.FRIENDSHIP_ID';
 
     /**
-     * the column name for the FRIENDSHIP_STATUS field
-     */
-    const COL_FRIENDSHIP_STATUS = 'friendship.FRIENDSHIP_STATUS';
-
-    /**
      * the column name for the INVITE_DATE field
      */
     const COL_INVITE_DATE = 'friendship.INVITE_DATE';
-
-    /**
-     * the column name for the ACCEPTANCE_DATE field
-     */
-    const COL_ACCEPTANCE_DATE = 'friendship.ACCEPTANCE_DATE';
 
     /**
      * the column name for the FRIEND1 field
@@ -113,12 +103,12 @@ class FriendshipTableMap extends TableMap
      * e.g. self::$fieldNames[self::TYPE_PHPNAME][0] = 'Id'
      */
     protected static $fieldNames = array (
-        self::TYPE_PHPNAME       => array('FriendshipId', 'FriendshipStatus', 'InviteDate', 'AcceptanceDate', 'Friend1', 'Friend2', ),
-        self::TYPE_STUDLYPHPNAME => array('friendshipId', 'friendshipStatus', 'inviteDate', 'acceptanceDate', 'friend1', 'friend2', ),
-        self::TYPE_COLNAME       => array(FriendshipTableMap::COL_FRIENDSHIP_ID, FriendshipTableMap::COL_FRIENDSHIP_STATUS, FriendshipTableMap::COL_INVITE_DATE, FriendshipTableMap::COL_ACCEPTANCE_DATE, FriendshipTableMap::COL_FRIEND1, FriendshipTableMap::COL_FRIEND2, ),
-        self::TYPE_RAW_COLNAME   => array('COL_FRIENDSHIP_ID', 'COL_FRIENDSHIP_STATUS', 'COL_INVITE_DATE', 'COL_ACCEPTANCE_DATE', 'COL_FRIEND1', 'COL_FRIEND2', ),
-        self::TYPE_FIELDNAME     => array('friendship_id', 'friendship_status', 'invite_date', 'acceptance_date', 'friend1', 'friend2', ),
-        self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, )
+        self::TYPE_PHPNAME       => array('FriendshipId', 'InviteDate', 'Friend1', 'Friend2', ),
+        self::TYPE_STUDLYPHPNAME => array('friendshipId', 'inviteDate', 'friend1', 'friend2', ),
+        self::TYPE_COLNAME       => array(FriendshipTableMap::COL_FRIENDSHIP_ID, FriendshipTableMap::COL_INVITE_DATE, FriendshipTableMap::COL_FRIEND1, FriendshipTableMap::COL_FRIEND2, ),
+        self::TYPE_RAW_COLNAME   => array('COL_FRIENDSHIP_ID', 'COL_INVITE_DATE', 'COL_FRIEND1', 'COL_FRIEND2', ),
+        self::TYPE_FIELDNAME     => array('friendship_id', 'invite_date', 'friend1', 'friend2', ),
+        self::TYPE_NUM           => array(0, 1, 2, 3, )
     );
 
     /**
@@ -128,12 +118,12 @@ class FriendshipTableMap extends TableMap
      * e.g. self::$fieldKeys[self::TYPE_PHPNAME]['Id'] = 0
      */
     protected static $fieldKeys = array (
-        self::TYPE_PHPNAME       => array('FriendshipId' => 0, 'FriendshipStatus' => 1, 'InviteDate' => 2, 'AcceptanceDate' => 3, 'Friend1' => 4, 'Friend2' => 5, ),
-        self::TYPE_STUDLYPHPNAME => array('friendshipId' => 0, 'friendshipStatus' => 1, 'inviteDate' => 2, 'acceptanceDate' => 3, 'friend1' => 4, 'friend2' => 5, ),
-        self::TYPE_COLNAME       => array(FriendshipTableMap::COL_FRIENDSHIP_ID => 0, FriendshipTableMap::COL_FRIENDSHIP_STATUS => 1, FriendshipTableMap::COL_INVITE_DATE => 2, FriendshipTableMap::COL_ACCEPTANCE_DATE => 3, FriendshipTableMap::COL_FRIEND1 => 4, FriendshipTableMap::COL_FRIEND2 => 5, ),
-        self::TYPE_RAW_COLNAME   => array('COL_FRIENDSHIP_ID' => 0, 'COL_FRIENDSHIP_STATUS' => 1, 'COL_INVITE_DATE' => 2, 'COL_ACCEPTANCE_DATE' => 3, 'COL_FRIEND1' => 4, 'COL_FRIEND2' => 5, ),
-        self::TYPE_FIELDNAME     => array('friendship_id' => 0, 'friendship_status' => 1, 'invite_date' => 2, 'acceptance_date' => 3, 'friend1' => 4, 'friend2' => 5, ),
-        self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, )
+        self::TYPE_PHPNAME       => array('FriendshipId' => 0, 'InviteDate' => 1, 'Friend1' => 2, 'Friend2' => 3, ),
+        self::TYPE_STUDLYPHPNAME => array('friendshipId' => 0, 'inviteDate' => 1, 'friend1' => 2, 'friend2' => 3, ),
+        self::TYPE_COLNAME       => array(FriendshipTableMap::COL_FRIENDSHIP_ID => 0, FriendshipTableMap::COL_INVITE_DATE => 1, FriendshipTableMap::COL_FRIEND1 => 2, FriendshipTableMap::COL_FRIEND2 => 3, ),
+        self::TYPE_RAW_COLNAME   => array('COL_FRIENDSHIP_ID' => 0, 'COL_INVITE_DATE' => 1, 'COL_FRIEND1' => 2, 'COL_FRIEND2' => 3, ),
+        self::TYPE_FIELDNAME     => array('friendship_id' => 0, 'invite_date' => 1, 'friend1' => 2, 'friend2' => 3, ),
+        self::TYPE_NUM           => array(0, 1, 2, 3, )
     );
 
     /**
@@ -153,9 +143,7 @@ class FriendshipTableMap extends TableMap
         $this->setUseIdGenerator(true);
         // columns
         $this->addPrimaryKey('FRIENDSHIP_ID', 'FriendshipId', 'BIGINT', true, null, null);
-        $this->addColumn('FRIENDSHIP_STATUS', 'FriendshipStatus', 'TINYINT', true, null, 0);
         $this->addColumn('INVITE_DATE', 'InviteDate', 'TIMESTAMP', true, null, null);
-        $this->addColumn('ACCEPTANCE_DATE', 'AcceptanceDate', 'TIMESTAMP', false, null, null);
         $this->addForeignKey('FRIEND1', 'Friend1', 'BIGINT', 'user', 'USER_ID', false, null, null);
         $this->addForeignKey('FRIEND2', 'Friend2', 'BIGINT', 'user', 'USER_ID', false, null, null);
     } // initialize()
@@ -311,16 +299,12 @@ class FriendshipTableMap extends TableMap
     {
         if (null === $alias) {
             $criteria->addSelectColumn(FriendshipTableMap::COL_FRIENDSHIP_ID);
-            $criteria->addSelectColumn(FriendshipTableMap::COL_FRIENDSHIP_STATUS);
             $criteria->addSelectColumn(FriendshipTableMap::COL_INVITE_DATE);
-            $criteria->addSelectColumn(FriendshipTableMap::COL_ACCEPTANCE_DATE);
             $criteria->addSelectColumn(FriendshipTableMap::COL_FRIEND1);
             $criteria->addSelectColumn(FriendshipTableMap::COL_FRIEND2);
         } else {
             $criteria->addSelectColumn($alias . '.FRIENDSHIP_ID');
-            $criteria->addSelectColumn($alias . '.FRIENDSHIP_STATUS');
             $criteria->addSelectColumn($alias . '.INVITE_DATE');
-            $criteria->addSelectColumn($alias . '.ACCEPTANCE_DATE');
             $criteria->addSelectColumn($alias . '.FRIEND1');
             $criteria->addSelectColumn($alias . '.FRIEND2');
         }

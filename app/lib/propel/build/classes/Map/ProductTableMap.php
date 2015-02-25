@@ -148,6 +148,7 @@ class ProductTableMap extends TableMap
     public function buildRelations()
     {
         $this->addRelation('ProductWishlistEntry', '\\ProductWishlistEntry', RelationMap::ONE_TO_MANY, array('product_id' => 'product_id', ), null, null, 'ProductWishlistEntries');
+        $this->addRelation('Sale', '\\Sale', RelationMap::ONE_TO_MANY, array('product_id' => 'product_id', ), null, null, 'Sales');
     } // buildRelations()
 
     /**

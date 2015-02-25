@@ -60,7 +60,19 @@ use Propel\Runtime\Exception\PropelException;
  * @method     ChildUserQuery rightJoinProductWishlistEntry($relationAlias = null) Adds a RIGHT JOIN clause to the query using the ProductWishlistEntry relation
  * @method     ChildUserQuery innerJoinProductWishlistEntry($relationAlias = null) Adds a INNER JOIN clause to the query using the ProductWishlistEntry relation
  *
- * @method     \PrivilegeTypeQuery|\FriendshipQuery|\ProductWishlistEntryQuery endUse() Finalizes a secondary criteria and merges it with its primary Criteria
+ * @method     ChildUserQuery leftJoinSale($relationAlias = null) Adds a LEFT JOIN clause to the query using the Sale relation
+ * @method     ChildUserQuery rightJoinSale($relationAlias = null) Adds a RIGHT JOIN clause to the query using the Sale relation
+ * @method     ChildUserQuery innerJoinSale($relationAlias = null) Adds a INNER JOIN clause to the query using the Sale relation
+ *
+ * @method     ChildUserQuery leftJoinSaleRatingRelatedByPostingUserId($relationAlias = null) Adds a LEFT JOIN clause to the query using the SaleRatingRelatedByPostingUserId relation
+ * @method     ChildUserQuery rightJoinSaleRatingRelatedByPostingUserId($relationAlias = null) Adds a RIGHT JOIN clause to the query using the SaleRatingRelatedByPostingUserId relation
+ * @method     ChildUserQuery innerJoinSaleRatingRelatedByPostingUserId($relationAlias = null) Adds a INNER JOIN clause to the query using the SaleRatingRelatedByPostingUserId relation
+ *
+ * @method     ChildUserQuery leftJoinSaleRatingRelatedByRatingUserId($relationAlias = null) Adds a LEFT JOIN clause to the query using the SaleRatingRelatedByRatingUserId relation
+ * @method     ChildUserQuery rightJoinSaleRatingRelatedByRatingUserId($relationAlias = null) Adds a RIGHT JOIN clause to the query using the SaleRatingRelatedByRatingUserId relation
+ * @method     ChildUserQuery innerJoinSaleRatingRelatedByRatingUserId($relationAlias = null) Adds a INNER JOIN clause to the query using the SaleRatingRelatedByRatingUserId relation
+ *
+ * @method     \PrivilegeTypeQuery|\FriendshipQuery|\ProductWishlistEntryQuery|\SaleQuery|\SaleRatingQuery endUse() Finalizes a secondary criteria and merges it with its primary Criteria
  *
  * @method     ChildUser findOne(ConnectionInterface $con = null) Return the first ChildUser matching the query
  * @method     ChildUser findOneOrCreate(ConnectionInterface $con = null) Return the first ChildUser matching the query, or a new ChildUser object populated from the query conditions when no match is found
@@ -869,6 +881,225 @@ abstract class UserQuery extends ModelCriteria
         return $this
             ->joinProductWishlistEntry($relationAlias, $joinType)
             ->useQuery($relationAlias ? $relationAlias : 'ProductWishlistEntry', '\ProductWishlistEntryQuery');
+    }
+
+    /**
+     * Filter the query by a related \Sale object
+     *
+     * @param \Sale|ObjectCollection $sale  the related object to use as filter
+     * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return ChildUserQuery The current query, for fluid interface
+     */
+    public function filterBySale($sale, $comparison = null)
+    {
+        if ($sale instanceof \Sale) {
+            return $this
+                ->addUsingAlias(UserTableMap::COL_USER_ID, $sale->getUserId(), $comparison);
+        } elseif ($sale instanceof ObjectCollection) {
+            return $this
+                ->useSaleQuery()
+                ->filterByPrimaryKeys($sale->getPrimaryKeys())
+                ->endUse();
+        } else {
+            throw new PropelException('filterBySale() only accepts arguments of type \Sale or Collection');
+        }
+    }
+
+    /**
+     * Adds a JOIN clause to the query using the Sale relation
+     *
+     * @param     string $relationAlias optional alias for the relation
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return $this|ChildUserQuery The current query, for fluid interface
+     */
+    public function joinSale($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
+    {
+        $tableMap = $this->getTableMap();
+        $relationMap = $tableMap->getRelation('Sale');
+
+        // create a ModelJoin object for this join
+        $join = new ModelJoin();
+        $join->setJoinType($joinType);
+        $join->setRelationMap($relationMap, $this->useAliasInSQL ? $this->getModelAlias() : null, $relationAlias);
+        if ($previousJoin = $this->getPreviousJoin()) {
+            $join->setPreviousJoin($previousJoin);
+        }
+
+        // add the ModelJoin to the current object
+        if ($relationAlias) {
+            $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
+            $this->addJoinObject($join, $relationAlias);
+        } else {
+            $this->addJoinObject($join, 'Sale');
+        }
+
+        return $this;
+    }
+
+    /**
+     * Use the Sale relation Sale object
+     *
+     * @see useQuery()
+     *
+     * @param     string $relationAlias optional alias for the relation,
+     *                                   to be used as main alias in the secondary query
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return \SaleQuery A secondary query class using the current class as primary query
+     */
+    public function useSaleQuery($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
+    {
+        return $this
+            ->joinSale($relationAlias, $joinType)
+            ->useQuery($relationAlias ? $relationAlias : 'Sale', '\SaleQuery');
+    }
+
+    /**
+     * Filter the query by a related \SaleRating object
+     *
+     * @param \SaleRating|ObjectCollection $saleRating  the related object to use as filter
+     * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return ChildUserQuery The current query, for fluid interface
+     */
+    public function filterBySaleRatingRelatedByPostingUserId($saleRating, $comparison = null)
+    {
+        if ($saleRating instanceof \SaleRating) {
+            return $this
+                ->addUsingAlias(UserTableMap::COL_USER_ID, $saleRating->getPostingUserId(), $comparison);
+        } elseif ($saleRating instanceof ObjectCollection) {
+            return $this
+                ->useSaleRatingRelatedByPostingUserIdQuery()
+                ->filterByPrimaryKeys($saleRating->getPrimaryKeys())
+                ->endUse();
+        } else {
+            throw new PropelException('filterBySaleRatingRelatedByPostingUserId() only accepts arguments of type \SaleRating or Collection');
+        }
+    }
+
+    /**
+     * Adds a JOIN clause to the query using the SaleRatingRelatedByPostingUserId relation
+     *
+     * @param     string $relationAlias optional alias for the relation
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return $this|ChildUserQuery The current query, for fluid interface
+     */
+    public function joinSaleRatingRelatedByPostingUserId($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
+    {
+        $tableMap = $this->getTableMap();
+        $relationMap = $tableMap->getRelation('SaleRatingRelatedByPostingUserId');
+
+        // create a ModelJoin object for this join
+        $join = new ModelJoin();
+        $join->setJoinType($joinType);
+        $join->setRelationMap($relationMap, $this->useAliasInSQL ? $this->getModelAlias() : null, $relationAlias);
+        if ($previousJoin = $this->getPreviousJoin()) {
+            $join->setPreviousJoin($previousJoin);
+        }
+
+        // add the ModelJoin to the current object
+        if ($relationAlias) {
+            $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
+            $this->addJoinObject($join, $relationAlias);
+        } else {
+            $this->addJoinObject($join, 'SaleRatingRelatedByPostingUserId');
+        }
+
+        return $this;
+    }
+
+    /**
+     * Use the SaleRatingRelatedByPostingUserId relation SaleRating object
+     *
+     * @see useQuery()
+     *
+     * @param     string $relationAlias optional alias for the relation,
+     *                                   to be used as main alias in the secondary query
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return \SaleRatingQuery A secondary query class using the current class as primary query
+     */
+    public function useSaleRatingRelatedByPostingUserIdQuery($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
+    {
+        return $this
+            ->joinSaleRatingRelatedByPostingUserId($relationAlias, $joinType)
+            ->useQuery($relationAlias ? $relationAlias : 'SaleRatingRelatedByPostingUserId', '\SaleRatingQuery');
+    }
+
+    /**
+     * Filter the query by a related \SaleRating object
+     *
+     * @param \SaleRating|ObjectCollection $saleRating  the related object to use as filter
+     * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return ChildUserQuery The current query, for fluid interface
+     */
+    public function filterBySaleRatingRelatedByRatingUserId($saleRating, $comparison = null)
+    {
+        if ($saleRating instanceof \SaleRating) {
+            return $this
+                ->addUsingAlias(UserTableMap::COL_USER_ID, $saleRating->getRatingUserId(), $comparison);
+        } elseif ($saleRating instanceof ObjectCollection) {
+            return $this
+                ->useSaleRatingRelatedByRatingUserIdQuery()
+                ->filterByPrimaryKeys($saleRating->getPrimaryKeys())
+                ->endUse();
+        } else {
+            throw new PropelException('filterBySaleRatingRelatedByRatingUserId() only accepts arguments of type \SaleRating or Collection');
+        }
+    }
+
+    /**
+     * Adds a JOIN clause to the query using the SaleRatingRelatedByRatingUserId relation
+     *
+     * @param     string $relationAlias optional alias for the relation
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return $this|ChildUserQuery The current query, for fluid interface
+     */
+    public function joinSaleRatingRelatedByRatingUserId($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
+    {
+        $tableMap = $this->getTableMap();
+        $relationMap = $tableMap->getRelation('SaleRatingRelatedByRatingUserId');
+
+        // create a ModelJoin object for this join
+        $join = new ModelJoin();
+        $join->setJoinType($joinType);
+        $join->setRelationMap($relationMap, $this->useAliasInSQL ? $this->getModelAlias() : null, $relationAlias);
+        if ($previousJoin = $this->getPreviousJoin()) {
+            $join->setPreviousJoin($previousJoin);
+        }
+
+        // add the ModelJoin to the current object
+        if ($relationAlias) {
+            $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
+            $this->addJoinObject($join, $relationAlias);
+        } else {
+            $this->addJoinObject($join, 'SaleRatingRelatedByRatingUserId');
+        }
+
+        return $this;
+    }
+
+    /**
+     * Use the SaleRatingRelatedByRatingUserId relation SaleRating object
+     *
+     * @see useQuery()
+     *
+     * @param     string $relationAlias optional alias for the relation,
+     *                                   to be used as main alias in the secondary query
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return \SaleRatingQuery A secondary query class using the current class as primary query
+     */
+    public function useSaleRatingRelatedByRatingUserIdQuery($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
+    {
+        return $this
+            ->joinSaleRatingRelatedByRatingUserId($relationAlias, $joinType)
+            ->useQuery($relationAlias ? $relationAlias : 'SaleRatingRelatedByRatingUserId', '\SaleRatingQuery');
     }
 
     /**

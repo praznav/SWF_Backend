@@ -6,6 +6,9 @@
 		<autoload name="ShoppingwithfriendsFriendsBaseAction">%core.module_dir%/Friends/lib/action/ShoppingwithfriendsFriendsBaseAction.class.php</autoload>
 		<autoload name="ShoppingwithfriendsFriendsBaseModel">%core.module_dir%/Friends/lib/model/ShoppingwithfriendsFriendsBaseModel.class.php</autoload>
 		<autoload name="ShoppingwithfriendsFriendsBaseView">%core.module_dir%/Friends/lib/view/ShoppingwithfriendsFriendsBaseView.class.php</autoload>
+        <autoload name="Friends_UsernameValidator">%core.module_dir%/Friends/lib/validator/UsernameValidator.class.php</autoload>
+        <autoload name="Friends_PasswordValidator">%core.module_dir%/Friends/lib/validator/PasswordValidator.class.php</autoload>
+        <autoload name="Friends_EmailValidator">%core.module_dir%/Friends/lib/validator/EmailValidator.class.php</autoload>
 		
 	</ae:configuration>
 	

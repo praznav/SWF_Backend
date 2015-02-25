@@ -2,8 +2,8 @@
 
 namespace Map;
 
-use \User;
-use \UserQuery;
+use \Sale;
+use \SaleQuery;
 use Propel\Runtime\Propel;
 use Propel\Runtime\ActiveQuery\Criteria;
 use Propel\Runtime\ActiveQuery\InstancePoolTrait;
@@ -16,7 +16,7 @@ use Propel\Runtime\Map\TableMapTrait;
 
 
 /**
- * This class defines the structure of the 'user' table.
+ * This class defines the structure of the 'sale' table.
  *
  *
  *
@@ -26,7 +26,7 @@ use Propel\Runtime\Map\TableMapTrait;
  * (i.e. if it's a text column type).
  *
  */
-class UserTableMap extends TableMap
+class SaleTableMap extends TableMap
 {
     use InstancePoolTrait;
     use TableMapTrait;
@@ -34,7 +34,7 @@ class UserTableMap extends TableMap
     /**
      * The (dot-path) name of this class
      */
-    const CLASS_NAME = '.Map.UserTableMap';
+    const CLASS_NAME = '.Map.SaleTableMap';
 
     /**
      * The default database name for this class
@@ -44,22 +44,22 @@ class UserTableMap extends TableMap
     /**
      * The table name for this class
      */
-    const TABLE_NAME = 'user';
+    const TABLE_NAME = 'sale';
 
     /**
      * The related Propel class for this table
      */
-    const OM_CLASS = '\\User';
+    const OM_CLASS = '\\Sale';
 
     /**
      * A class that can be returned by this tableMap
      */
-    const CLASS_DEFAULT = 'User';
+    const CLASS_DEFAULT = 'Sale';
 
     /**
      * The total number of columns
      */
-    const NUM_COLUMNS = 9;
+    const NUM_COLUMNS = 4;
 
     /**
      * The number of lazy-loaded columns
@@ -69,52 +69,27 @@ class UserTableMap extends TableMap
     /**
      * The number of columns to hydrate (NUM_COLUMNS - NUM_LAZY_LOAD_COLUMNS)
      */
-    const NUM_HYDRATE_COLUMNS = 9;
+    const NUM_HYDRATE_COLUMNS = 4;
+
+    /**
+     * the column name for the SALE_ID field
+     */
+    const COL_SALE_ID = 'sale.SALE_ID';
+
+    /**
+     * the column name for the LOCATION field
+     */
+    const COL_LOCATION = 'sale.LOCATION';
 
     /**
      * the column name for the USER_ID field
      */
-    const COL_USER_ID = 'user.USER_ID';
+    const COL_USER_ID = 'sale.USER_ID';
 
     /**
-     * the column name for the USERNAME field
+     * the column name for the PRODUCT_ID field
      */
-    const COL_USERNAME = 'user.USERNAME';
-
-    /**
-     * the column name for the PASSWORD field
-     */
-    const COL_PASSWORD = 'user.PASSWORD';
-
-    /**
-     * the column name for the EMAIL field
-     */
-    const COL_EMAIL = 'user.EMAIL';
-
-    /**
-     * the column name for the FIRST_NAME field
-     */
-    const COL_FIRST_NAME = 'user.FIRST_NAME';
-
-    /**
-     * the column name for the LAST_NAME field
-     */
-    const COL_LAST_NAME = 'user.LAST_NAME';
-
-    /**
-     * the column name for the LAST_SUCCESSFUL_LOGIN field
-     */
-    const COL_LAST_SUCCESSFUL_LOGIN = 'user.LAST_SUCCESSFUL_LOGIN';
-
-    /**
-     * the column name for the INCORRECT_LOGIN_ATTEMPTS field
-     */
-    const COL_INCORRECT_LOGIN_ATTEMPTS = 'user.INCORRECT_LOGIN_ATTEMPTS';
-
-    /**
-     * the column name for the PRIVELEGE_TYPE_ID field
-     */
-    const COL_PRIVELEGE_TYPE_ID = 'user.PRIVELEGE_TYPE_ID';
+    const COL_PRODUCT_ID = 'sale.PRODUCT_ID';
 
     /**
      * The default string format for model objects of the related table
@@ -128,12 +103,12 @@ class UserTableMap extends TableMap
      * e.g. self::$fieldNames[self::TYPE_PHPNAME][0] = 'Id'
      */
     protected static $fieldNames = array (
-        self::TYPE_PHPNAME       => array('UserId', 'Username', 'Password', 'Email', 'FirstName', 'LastName', 'LastSuccessfulLogin', 'IncorrectLoginAttempts', 'PrivelegeTypeId', ),
-        self::TYPE_STUDLYPHPNAME => array('userId', 'username', 'password', 'email', 'firstName', 'lastName', 'lastSuccessfulLogin', 'incorrectLoginAttempts', 'privelegeTypeId', ),
-        self::TYPE_COLNAME       => array(UserTableMap::COL_USER_ID, UserTableMap::COL_USERNAME, UserTableMap::COL_PASSWORD, UserTableMap::COL_EMAIL, UserTableMap::COL_FIRST_NAME, UserTableMap::COL_LAST_NAME, UserTableMap::COL_LAST_SUCCESSFUL_LOGIN, UserTableMap::COL_INCORRECT_LOGIN_ATTEMPTS, UserTableMap::COL_PRIVELEGE_TYPE_ID, ),
-        self::TYPE_RAW_COLNAME   => array('COL_USER_ID', 'COL_USERNAME', 'COL_PASSWORD', 'COL_EMAIL', 'COL_FIRST_NAME', 'COL_LAST_NAME', 'COL_LAST_SUCCESSFUL_LOGIN', 'COL_INCORRECT_LOGIN_ATTEMPTS', 'COL_PRIVELEGE_TYPE_ID', ),
-        self::TYPE_FIELDNAME     => array('user_id', 'username', 'password', 'email', 'first_name', 'last_name', 'last_successful_login', 'incorrect_login_attempts', 'privelege_type_id', ),
-        self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, 6, 7, 8, )
+        self::TYPE_PHPNAME       => array('SaleId', 'Location', 'UserId', 'ProductId', ),
+        self::TYPE_STUDLYPHPNAME => array('saleId', 'location', 'userId', 'productId', ),
+        self::TYPE_COLNAME       => array(SaleTableMap::COL_SALE_ID, SaleTableMap::COL_LOCATION, SaleTableMap::COL_USER_ID, SaleTableMap::COL_PRODUCT_ID, ),
+        self::TYPE_RAW_COLNAME   => array('COL_SALE_ID', 'COL_LOCATION', 'COL_USER_ID', 'COL_PRODUCT_ID', ),
+        self::TYPE_FIELDNAME     => array('sale_id', 'location', 'user_id', 'product_id', ),
+        self::TYPE_NUM           => array(0, 1, 2, 3, )
     );
 
     /**
@@ -143,12 +118,12 @@ class UserTableMap extends TableMap
      * e.g. self::$fieldKeys[self::TYPE_PHPNAME]['Id'] = 0
      */
     protected static $fieldKeys = array (
-        self::TYPE_PHPNAME       => array('UserId' => 0, 'Username' => 1, 'Password' => 2, 'Email' => 3, 'FirstName' => 4, 'LastName' => 5, 'LastSuccessfulLogin' => 6, 'IncorrectLoginAttempts' => 7, 'PrivelegeTypeId' => 8, ),
-        self::TYPE_STUDLYPHPNAME => array('userId' => 0, 'username' => 1, 'password' => 2, 'email' => 3, 'firstName' => 4, 'lastName' => 5, 'lastSuccessfulLogin' => 6, 'incorrectLoginAttempts' => 7, 'privelegeTypeId' => 8, ),
-        self::TYPE_COLNAME       => array(UserTableMap::COL_USER_ID => 0, UserTableMap::COL_USERNAME => 1, UserTableMap::COL_PASSWORD => 2, UserTableMap::COL_EMAIL => 3, UserTableMap::COL_FIRST_NAME => 4, UserTableMap::COL_LAST_NAME => 5, UserTableMap::COL_LAST_SUCCESSFUL_LOGIN => 6, UserTableMap::COL_INCORRECT_LOGIN_ATTEMPTS => 7, UserTableMap::COL_PRIVELEGE_TYPE_ID => 8, ),
-        self::TYPE_RAW_COLNAME   => array('COL_USER_ID' => 0, 'COL_USERNAME' => 1, 'COL_PASSWORD' => 2, 'COL_EMAIL' => 3, 'COL_FIRST_NAME' => 4, 'COL_LAST_NAME' => 5, 'COL_LAST_SUCCESSFUL_LOGIN' => 6, 'COL_INCORRECT_LOGIN_ATTEMPTS' => 7, 'COL_PRIVELEGE_TYPE_ID' => 8, ),
-        self::TYPE_FIELDNAME     => array('user_id' => 0, 'username' => 1, 'password' => 2, 'email' => 3, 'first_name' => 4, 'last_name' => 5, 'last_successful_login' => 6, 'incorrect_login_attempts' => 7, 'privelege_type_id' => 8, ),
-        self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, 6, 7, 8, )
+        self::TYPE_PHPNAME       => array('SaleId' => 0, 'Location' => 1, 'UserId' => 2, 'ProductId' => 3, ),
+        self::TYPE_STUDLYPHPNAME => array('saleId' => 0, 'location' => 1, 'userId' => 2, 'productId' => 3, ),
+        self::TYPE_COLNAME       => array(SaleTableMap::COL_SALE_ID => 0, SaleTableMap::COL_LOCATION => 1, SaleTableMap::COL_USER_ID => 2, SaleTableMap::COL_PRODUCT_ID => 3, ),
+        self::TYPE_RAW_COLNAME   => array('COL_SALE_ID' => 0, 'COL_LOCATION' => 1, 'COL_USER_ID' => 2, 'COL_PRODUCT_ID' => 3, ),
+        self::TYPE_FIELDNAME     => array('sale_id' => 0, 'location' => 1, 'user_id' => 2, 'product_id' => 3, ),
+        self::TYPE_NUM           => array(0, 1, 2, 3, )
     );
 
     /**
@@ -161,21 +136,16 @@ class UserTableMap extends TableMap
     public function initialize()
     {
         // attributes
-        $this->setName('user');
-        $this->setPhpName('User');
-        $this->setClassName('\\User');
+        $this->setName('sale');
+        $this->setPhpName('Sale');
+        $this->setClassName('\\Sale');
         $this->setPackage('');
         $this->setUseIdGenerator(true);
         // columns
-        $this->addPrimaryKey('USER_ID', 'UserId', 'BIGINT', true, null, null);
-        $this->addColumn('USERNAME', 'Username', 'VARCHAR', true, 25, null);
-        $this->addColumn('PASSWORD', 'Password', 'VARCHAR', true, 50, null);
-        $this->addColumn('EMAIL', 'Email', 'VARCHAR', false, 50, null);
-        $this->addColumn('FIRST_NAME', 'FirstName', 'VARCHAR', false, 25, null);
-        $this->addColumn('LAST_NAME', 'LastName', 'VARCHAR', false, 25, null);
-        $this->addColumn('LAST_SUCCESSFUL_LOGIN', 'LastSuccessfulLogin', 'TIMESTAMP', false, null, null);
-        $this->addColumn('INCORRECT_LOGIN_ATTEMPTS', 'IncorrectLoginAttempts', 'TINYINT', false, null, null);
-        $this->addForeignKey('PRIVELEGE_TYPE_ID', 'PrivelegeTypeId', 'TINYINT', 'privilege_type', 'PRIVELEGE_TYPE_ID', false, 3, null);
+        $this->addPrimaryKey('SALE_ID', 'SaleId', 'BIGINT', true, null, null);
+        $this->addColumn('LOCATION', 'Location', 'VARCHAR', true, 50, null);
+        $this->addForeignKey('USER_ID', 'UserId', 'BIGINT', 'user', 'USER_ID', false, null, null);
+        $this->addForeignKey('PRODUCT_ID', 'ProductId', 'BIGINT', 'product', 'PRODUCT_ID', false, null, null);
     } // initialize()
 
     /**
@@ -183,13 +153,9 @@ class UserTableMap extends TableMap
      */
     public function buildRelations()
     {
-        $this->addRelation('PrivilegeType', '\\PrivilegeType', RelationMap::MANY_TO_ONE, array('privelege_type_id' => 'privelege_type_id', ), null, null);
-        $this->addRelation('FriendshipRelatedByFriend2', '\\Friendship', RelationMap::ONE_TO_MANY, array('user_id' => 'friend2', ), null, null, 'FriendshipsRelatedByFriend2');
-        $this->addRelation('FriendshipRelatedByFriend1', '\\Friendship', RelationMap::ONE_TO_MANY, array('user_id' => 'friend1', ), null, null, 'FriendshipsRelatedByFriend1');
-        $this->addRelation('ProductWishlistEntry', '\\ProductWishlistEntry', RelationMap::ONE_TO_MANY, array('user_id' => 'user_id', ), null, null, 'ProductWishlistEntries');
-        $this->addRelation('Sale', '\\Sale', RelationMap::ONE_TO_MANY, array('user_id' => 'user_id', ), null, null, 'Sales');
-        $this->addRelation('SaleRatingRelatedByPostingUserId', '\\SaleRating', RelationMap::ONE_TO_MANY, array('user_id' => 'posting_user_id', ), null, null, 'SaleRatingsRelatedByPostingUserId');
-        $this->addRelation('SaleRatingRelatedByRatingUserId', '\\SaleRating', RelationMap::ONE_TO_MANY, array('user_id' => 'rating_user_id', ), null, null, 'SaleRatingsRelatedByRatingUserId');
+        $this->addRelation('Product', '\\Product', RelationMap::MANY_TO_ONE, array('product_id' => 'product_id', ), null, null);
+        $this->addRelation('User', '\\User', RelationMap::MANY_TO_ONE, array('user_id' => 'user_id', ), null, null);
+        $this->addRelation('SaleRating', '\\SaleRating', RelationMap::ONE_TO_MANY, array('sale_id' => 'sale_id', ), null, null, 'SaleRatings');
     } // buildRelations()
 
     /**
@@ -208,11 +174,11 @@ class UserTableMap extends TableMap
     public static function getPrimaryKeyHashFromRow($row, $offset = 0, $indexType = TableMap::TYPE_NUM)
     {
         // If the PK cannot be derived from the row, return NULL.
-        if ($row[TableMap::TYPE_NUM == $indexType ? 0 + $offset : static::translateFieldName('UserId', TableMap::TYPE_PHPNAME, $indexType)] === null) {
+        if ($row[TableMap::TYPE_NUM == $indexType ? 0 + $offset : static::translateFieldName('SaleId', TableMap::TYPE_PHPNAME, $indexType)] === null) {
             return null;
         }
 
-        return (string) $row[TableMap::TYPE_NUM == $indexType ? 0 + $offset : static::translateFieldName('UserId', TableMap::TYPE_PHPNAME, $indexType)];
+        return (string) $row[TableMap::TYPE_NUM == $indexType ? 0 + $offset : static::translateFieldName('SaleId', TableMap::TYPE_PHPNAME, $indexType)];
     }
 
     /**
@@ -232,7 +198,7 @@ class UserTableMap extends TableMap
         return (string) $row[
             $indexType == TableMap::TYPE_NUM
                 ? 0 + $offset
-                : self::translateFieldName('UserId', TableMap::TYPE_PHPNAME, $indexType)
+                : self::translateFieldName('SaleId', TableMap::TYPE_PHPNAME, $indexType)
         ];
     }
 
@@ -249,7 +215,7 @@ class UserTableMap extends TableMap
      */
     public static function getOMClass($withPrefix = true)
     {
-        return $withPrefix ? UserTableMap::CLASS_DEFAULT : UserTableMap::OM_CLASS;
+        return $withPrefix ? SaleTableMap::CLASS_DEFAULT : SaleTableMap::OM_CLASS;
     }
 
     /**
@@ -263,22 +229,22 @@ class UserTableMap extends TableMap
      *
      * @throws PropelException Any exceptions caught during processing will be
      *                         rethrown wrapped into a PropelException.
-     * @return array           (User object, last column rank)
+     * @return array           (Sale object, last column rank)
      */
     public static function populateObject($row, $offset = 0, $indexType = TableMap::TYPE_NUM)
     {
-        $key = UserTableMap::getPrimaryKeyHashFromRow($row, $offset, $indexType);
-        if (null !== ($obj = UserTableMap::getInstanceFromPool($key))) {
+        $key = SaleTableMap::getPrimaryKeyHashFromRow($row, $offset, $indexType);
+        if (null !== ($obj = SaleTableMap::getInstanceFromPool($key))) {
             // We no longer rehydrate the object, since this can cause data loss.
             // See http://www.propelorm.org/ticket/509
             // $obj->hydrate($row, $offset, true); // rehydrate
-            $col = $offset + UserTableMap::NUM_HYDRATE_COLUMNS;
+            $col = $offset + SaleTableMap::NUM_HYDRATE_COLUMNS;
         } else {
-            $cls = UserTableMap::OM_CLASS;
-            /** @var User $obj */
+            $cls = SaleTableMap::OM_CLASS;
+            /** @var Sale $obj */
             $obj = new $cls();
             $col = $obj->hydrate($row, $offset, false, $indexType);
-            UserTableMap::addInstanceToPool($obj, $key);
+            SaleTableMap::addInstanceToPool($obj, $key);
         }
 
         return array($obj, $col);
@@ -301,18 +267,18 @@ class UserTableMap extends TableMap
         $cls = static::getOMClass(false);
         // populate the object(s)
         while ($row = $dataFetcher->fetch()) {
-            $key = UserTableMap::getPrimaryKeyHashFromRow($row, 0, $dataFetcher->getIndexType());
-            if (null !== ($obj = UserTableMap::getInstanceFromPool($key))) {
+            $key = SaleTableMap::getPrimaryKeyHashFromRow($row, 0, $dataFetcher->getIndexType());
+            if (null !== ($obj = SaleTableMap::getInstanceFromPool($key))) {
                 // We no longer rehydrate the object, since this can cause data loss.
                 // See http://www.propelorm.org/ticket/509
                 // $obj->hydrate($row, 0, true); // rehydrate
                 $results[] = $obj;
             } else {
-                /** @var User $obj */
+                /** @var Sale $obj */
                 $obj = new $cls();
                 $obj->hydrate($row);
                 $results[] = $obj;
-                UserTableMap::addInstanceToPool($obj, $key);
+                SaleTableMap::addInstanceToPool($obj, $key);
             } // if key exists
         }
 
@@ -333,25 +299,15 @@ class UserTableMap extends TableMap
     public static function addSelectColumns(Criteria $criteria, $alias = null)
     {
         if (null === $alias) {
-            $criteria->addSelectColumn(UserTableMap::COL_USER_ID);
-            $criteria->addSelectColumn(UserTableMap::COL_USERNAME);
-            $criteria->addSelectColumn(UserTableMap::COL_PASSWORD);
-            $criteria->addSelectColumn(UserTableMap::COL_EMAIL);
-            $criteria->addSelectColumn(UserTableMap::COL_FIRST_NAME);
-            $criteria->addSelectColumn(UserTableMap::COL_LAST_NAME);
-            $criteria->addSelectColumn(UserTableMap::COL_LAST_SUCCESSFUL_LOGIN);
-            $criteria->addSelectColumn(UserTableMap::COL_INCORRECT_LOGIN_ATTEMPTS);
-            $criteria->addSelectColumn(UserTableMap::COL_PRIVELEGE_TYPE_ID);
+            $criteria->addSelectColumn(SaleTableMap::COL_SALE_ID);
+            $criteria->addSelectColumn(SaleTableMap::COL_LOCATION);
+            $criteria->addSelectColumn(SaleTableMap::COL_USER_ID);
+            $criteria->addSelectColumn(SaleTableMap::COL_PRODUCT_ID);
         } else {
+            $criteria->addSelectColumn($alias . '.SALE_ID');
+            $criteria->addSelectColumn($alias . '.LOCATION');
             $criteria->addSelectColumn($alias . '.USER_ID');
-            $criteria->addSelectColumn($alias . '.USERNAME');
-            $criteria->addSelectColumn($alias . '.PASSWORD');
-            $criteria->addSelectColumn($alias . '.EMAIL');
-            $criteria->addSelectColumn($alias . '.FIRST_NAME');
-            $criteria->addSelectColumn($alias . '.LAST_NAME');
-            $criteria->addSelectColumn($alias . '.LAST_SUCCESSFUL_LOGIN');
-            $criteria->addSelectColumn($alias . '.INCORRECT_LOGIN_ATTEMPTS');
-            $criteria->addSelectColumn($alias . '.PRIVELEGE_TYPE_ID');
+            $criteria->addSelectColumn($alias . '.PRODUCT_ID');
         }
     }
 
@@ -364,7 +320,7 @@ class UserTableMap extends TableMap
      */
     public static function getTableMap()
     {
-        return Propel::getServiceContainer()->getDatabaseMap(UserTableMap::DATABASE_NAME)->getTable(UserTableMap::TABLE_NAME);
+        return Propel::getServiceContainer()->getDatabaseMap(SaleTableMap::DATABASE_NAME)->getTable(SaleTableMap::TABLE_NAME);
     }
 
     /**
@@ -372,16 +328,16 @@ class UserTableMap extends TableMap
      */
     public static function buildTableMap()
     {
-        $dbMap = Propel::getServiceContainer()->getDatabaseMap(UserTableMap::DATABASE_NAME);
-        if (!$dbMap->hasTable(UserTableMap::TABLE_NAME)) {
-            $dbMap->addTableObject(new UserTableMap());
+        $dbMap = Propel::getServiceContainer()->getDatabaseMap(SaleTableMap::DATABASE_NAME);
+        if (!$dbMap->hasTable(SaleTableMap::TABLE_NAME)) {
+            $dbMap->addTableObject(new SaleTableMap());
         }
     }
 
     /**
-     * Performs a DELETE on the database, given a User or Criteria object OR a primary key value.
+     * Performs a DELETE on the database, given a Sale or Criteria object OR a primary key value.
      *
-     * @param mixed               $values Criteria or User object or primary key or array of primary keys
+     * @param mixed               $values Criteria or Sale object or primary key or array of primary keys
      *              which is used to create the DELETE statement
      * @param  ConnectionInterface $con the connection to use
      * @return int             The number of affected rows (if supported by underlying database driver).  This includes CASCADE-related rows
@@ -392,27 +348,27 @@ class UserTableMap extends TableMap
      public static function doDelete($values, ConnectionInterface $con = null)
      {
         if (null === $con) {
-            $con = Propel::getServiceContainer()->getWriteConnection(UserTableMap::DATABASE_NAME);
+            $con = Propel::getServiceContainer()->getWriteConnection(SaleTableMap::DATABASE_NAME);
         }
 
         if ($values instanceof Criteria) {
             // rename for clarity
             $criteria = $values;
-        } elseif ($values instanceof \User) { // it's a model object
+        } elseif ($values instanceof \Sale) { // it's a model object
             // create criteria based on pk values
             $criteria = $values->buildPkeyCriteria();
         } else { // it's a primary key, or an array of pks
-            $criteria = new Criteria(UserTableMap::DATABASE_NAME);
-            $criteria->add(UserTableMap::COL_USER_ID, (array) $values, Criteria::IN);
+            $criteria = new Criteria(SaleTableMap::DATABASE_NAME);
+            $criteria->add(SaleTableMap::COL_SALE_ID, (array) $values, Criteria::IN);
         }
 
-        $query = UserQuery::create()->mergeWith($criteria);
+        $query = SaleQuery::create()->mergeWith($criteria);
 
         if ($values instanceof Criteria) {
-            UserTableMap::clearInstancePool();
+            SaleTableMap::clearInstancePool();
         } elseif (!is_object($values)) { // it's a primary key, or an array of pks
             foreach ((array) $values as $singleval) {
-                UserTableMap::removeInstanceFromPool($singleval);
+                SaleTableMap::removeInstanceFromPool($singleval);
             }
         }
 
@@ -420,20 +376,20 @@ class UserTableMap extends TableMap
     }
 
     /**
-     * Deletes all rows from the user table.
+     * Deletes all rows from the sale table.
      *
      * @param ConnectionInterface $con the connection to use
      * @return int The number of affected rows (if supported by underlying database driver).
      */
     public static function doDeleteAll(ConnectionInterface $con = null)
     {
-        return UserQuery::create()->doDeleteAll($con);
+        return SaleQuery::create()->doDeleteAll($con);
     }
 
     /**
-     * Performs an INSERT on the database, given a User or Criteria object.
+     * Performs an INSERT on the database, given a Sale or Criteria object.
      *
-     * @param mixed               $criteria Criteria or User object containing data that is used to create the INSERT statement.
+     * @param mixed               $criteria Criteria or Sale object containing data that is used to create the INSERT statement.
      * @param ConnectionInterface $con the ConnectionInterface connection to use
      * @return mixed           The new primary key.
      * @throws PropelException Any exceptions caught during processing will be
@@ -442,22 +398,22 @@ class UserTableMap extends TableMap
     public static function doInsert($criteria, ConnectionInterface $con = null)
     {
         if (null === $con) {
-            $con = Propel::getServiceContainer()->getWriteConnection(UserTableMap::DATABASE_NAME);
+            $con = Propel::getServiceContainer()->getWriteConnection(SaleTableMap::DATABASE_NAME);
         }
 
         if ($criteria instanceof Criteria) {
             $criteria = clone $criteria; // rename for clarity
         } else {
-            $criteria = $criteria->buildCriteria(); // build Criteria from User object
+            $criteria = $criteria->buildCriteria(); // build Criteria from Sale object
         }
 
-        if ($criteria->containsKey(UserTableMap::COL_USER_ID) && $criteria->keyContainsValue(UserTableMap::COL_USER_ID) ) {
-            throw new PropelException('Cannot insert a value for auto-increment primary key ('.UserTableMap::COL_USER_ID.')');
+        if ($criteria->containsKey(SaleTableMap::COL_SALE_ID) && $criteria->keyContainsValue(SaleTableMap::COL_SALE_ID) ) {
+            throw new PropelException('Cannot insert a value for auto-increment primary key ('.SaleTableMap::COL_SALE_ID.')');
         }
 
 
         // Set the correct dbName
-        $query = UserQuery::create()->mergeWith($criteria);
+        $query = SaleQuery::create()->mergeWith($criteria);
 
         // use transaction because $criteria could contain info
         // for more than one table (I guess, conceivably)
@@ -466,7 +422,7 @@ class UserTableMap extends TableMap
         });
     }
 
-} // UserTableMap
+} // SaleTableMap
 // This is the static code needed to register the TableMap for this table with the main Propel class.
 //
-UserTableMap::buildTableMap();
+SaleTableMap::buildTableMap();

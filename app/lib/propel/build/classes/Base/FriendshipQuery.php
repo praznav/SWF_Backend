@@ -21,16 +21,12 @@ use Propel\Runtime\Exception\PropelException;
  *
  *
  * @method     ChildFriendshipQuery orderByFriendshipId($order = Criteria::ASC) Order by the friendship_id column
- * @method     ChildFriendshipQuery orderByFriendshipStatus($order = Criteria::ASC) Order by the friendship_status column
  * @method     ChildFriendshipQuery orderByInviteDate($order = Criteria::ASC) Order by the invite_date column
- * @method     ChildFriendshipQuery orderByAcceptanceDate($order = Criteria::ASC) Order by the acceptance_date column
  * @method     ChildFriendshipQuery orderByFriend1($order = Criteria::ASC) Order by the friend1 column
  * @method     ChildFriendshipQuery orderByFriend2($order = Criteria::ASC) Order by the friend2 column
  *
  * @method     ChildFriendshipQuery groupByFriendshipId() Group by the friendship_id column
- * @method     ChildFriendshipQuery groupByFriendshipStatus() Group by the friendship_status column
  * @method     ChildFriendshipQuery groupByInviteDate() Group by the invite_date column
- * @method     ChildFriendshipQuery groupByAcceptanceDate() Group by the acceptance_date column
  * @method     ChildFriendshipQuery groupByFriend1() Group by the friend1 column
  * @method     ChildFriendshipQuery groupByFriend2() Group by the friend2 column
  *
@@ -52,17 +48,13 @@ use Propel\Runtime\Exception\PropelException;
  * @method     ChildFriendship findOneOrCreate(ConnectionInterface $con = null) Return the first ChildFriendship matching the query, or a new ChildFriendship object populated from the query conditions when no match is found
  *
  * @method     ChildFriendship findOneByFriendshipId(string $friendship_id) Return the first ChildFriendship filtered by the friendship_id column
- * @method     ChildFriendship findOneByFriendshipStatus(int $friendship_status) Return the first ChildFriendship filtered by the friendship_status column
  * @method     ChildFriendship findOneByInviteDate(string $invite_date) Return the first ChildFriendship filtered by the invite_date column
- * @method     ChildFriendship findOneByAcceptanceDate(string $acceptance_date) Return the first ChildFriendship filtered by the acceptance_date column
  * @method     ChildFriendship findOneByFriend1(string $friend1) Return the first ChildFriendship filtered by the friend1 column
  * @method     ChildFriendship findOneByFriend2(string $friend2) Return the first ChildFriendship filtered by the friend2 column
  *
  * @method     ChildFriendship[]|ObjectCollection find(ConnectionInterface $con = null) Return ChildFriendship objects based on current ModelCriteria
  * @method     ChildFriendship[]|ObjectCollection findByFriendshipId(string $friendship_id) Return ChildFriendship objects filtered by the friendship_id column
- * @method     ChildFriendship[]|ObjectCollection findByFriendshipStatus(int $friendship_status) Return ChildFriendship objects filtered by the friendship_status column
  * @method     ChildFriendship[]|ObjectCollection findByInviteDate(string $invite_date) Return ChildFriendship objects filtered by the invite_date column
- * @method     ChildFriendship[]|ObjectCollection findByAcceptanceDate(string $acceptance_date) Return ChildFriendship objects filtered by the acceptance_date column
  * @method     ChildFriendship[]|ObjectCollection findByFriend1(string $friend1) Return ChildFriendship objects filtered by the friend1 column
  * @method     ChildFriendship[]|ObjectCollection findByFriend2(string $friend2) Return ChildFriendship objects filtered by the friend2 column
  * @method     ChildFriendship[]|\Propel\Runtime\Util\PropelModelPager paginate($page = 1, $maxPerPage = 10, ConnectionInterface $con = null) Issue a SELECT query based on the current ModelCriteria and uses a page and a maximum number of results per page to compute an offset and a limit
@@ -154,7 +146,7 @@ abstract class FriendshipQuery extends ModelCriteria
      */
     protected function findPkSimple($key, ConnectionInterface $con)
     {
-        $sql = 'SELECT FRIENDSHIP_ID, FRIENDSHIP_STATUS, INVITE_DATE, ACCEPTANCE_DATE, FRIEND1, FRIEND2 FROM friendship WHERE FRIENDSHIP_ID = :p0';
+        $sql = 'SELECT FRIENDSHIP_ID, INVITE_DATE, FRIEND1, FRIEND2 FROM friendship WHERE FRIENDSHIP_ID = :p0';
         try {
             $stmt = $con->prepare($sql);
             $stmt->bindValue(':p0', $key, PDO::PARAM_INT);
@@ -286,47 +278,6 @@ abstract class FriendshipQuery extends ModelCriteria
     }
 
     /**
-     * Filter the query on the friendship_status column
-     *
-     * Example usage:
-     * <code>
-     * $query->filterByFriendshipStatus(1234); // WHERE friendship_status = 1234
-     * $query->filterByFriendshipStatus(array(12, 34)); // WHERE friendship_status IN (12, 34)
-     * $query->filterByFriendshipStatus(array('min' => 12)); // WHERE friendship_status > 12
-     * </code>
-     *
-     * @param     mixed $friendshipStatus The value to use as filter.
-     *              Use scalar values for equality.
-     *              Use array values for in_array() equivalent.
-     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
-     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
-     *
-     * @return $this|ChildFriendshipQuery The current query, for fluid interface
-     */
-    public function filterByFriendshipStatus($friendshipStatus = null, $comparison = null)
-    {
-        if (is_array($friendshipStatus)) {
-            $useMinMax = false;
-            if (isset($friendshipStatus['min'])) {
-                $this->addUsingAlias(FriendshipTableMap::COL_FRIENDSHIP_STATUS, $friendshipStatus['min'], Criteria::GREATER_EQUAL);
-                $useMinMax = true;
-            }
-            if (isset($friendshipStatus['max'])) {
-                $this->addUsingAlias(FriendshipTableMap::COL_FRIENDSHIP_STATUS, $friendshipStatus['max'], Criteria::LESS_EQUAL);
-                $useMinMax = true;
-            }
-            if ($useMinMax) {
-                return $this;
-            }
-            if (null === $comparison) {
-                $comparison = Criteria::IN;
-            }
-        }
-
-        return $this->addUsingAlias(FriendshipTableMap::COL_FRIENDSHIP_STATUS, $friendshipStatus, $comparison);
-    }
-
-    /**
      * Filter the query on the invite_date column
      *
      * Example usage:
@@ -367,49 +318,6 @@ abstract class FriendshipQuery extends ModelCriteria
         }
 
         return $this->addUsingAlias(FriendshipTableMap::COL_INVITE_DATE, $inviteDate, $comparison);
-    }
-
-    /**
-     * Filter the query on the acceptance_date column
-     *
-     * Example usage:
-     * <code>
-     * $query->filterByAcceptanceDate('2011-03-14'); // WHERE acceptance_date = '2011-03-14'
-     * $query->filterByAcceptanceDate('now'); // WHERE acceptance_date = '2011-03-14'
-     * $query->filterByAcceptanceDate(array('max' => 'yesterday')); // WHERE acceptance_date > '2011-03-13'
-     * </code>
-     *
-     * @param     mixed $acceptanceDate The value to use as filter.
-     *              Values can be integers (unix timestamps), DateTime objects, or strings.
-     *              Empty strings are treated as NULL.
-     *              Use scalar values for equality.
-     *              Use array values for in_array() equivalent.
-     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
-     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
-     *
-     * @return $this|ChildFriendshipQuery The current query, for fluid interface
-     */
-    public function filterByAcceptanceDate($acceptanceDate = null, $comparison = null)
-    {
-        if (is_array($acceptanceDate)) {
-            $useMinMax = false;
-            if (isset($acceptanceDate['min'])) {
-                $this->addUsingAlias(FriendshipTableMap::COL_ACCEPTANCE_DATE, $acceptanceDate['min'], Criteria::GREATER_EQUAL);
-                $useMinMax = true;
-            }
-            if (isset($acceptanceDate['max'])) {
-                $this->addUsingAlias(FriendshipTableMap::COL_ACCEPTANCE_DATE, $acceptanceDate['max'], Criteria::LESS_EQUAL);
-                $useMinMax = true;
-            }
-            if ($useMinMax) {
-                return $this;
-            }
-            if (null === $comparison) {
-                $comparison = Criteria::IN;
-            }
-        }
-
-        return $this->addUsingAlias(FriendshipTableMap::COL_ACCEPTANCE_DATE, $acceptanceDate, $comparison);
     }
 
     /**

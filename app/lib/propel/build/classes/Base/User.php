@@ -8,6 +8,10 @@ use \PrivilegeType as ChildPrivilegeType;
 use \PrivilegeTypeQuery as ChildPrivilegeTypeQuery;
 use \ProductWishlistEntry as ChildProductWishlistEntry;
 use \ProductWishlistEntryQuery as ChildProductWishlistEntryQuery;
+use \Sale as ChildSale;
+use \SaleQuery as ChildSaleQuery;
+use \SaleRating as ChildSaleRating;
+use \SaleRatingQuery as ChildSaleRatingQuery;
 use \User as ChildUser;
 use \UserQuery as ChildUserQuery;
 use \DateTime;
@@ -140,6 +144,24 @@ abstract class User implements ActiveRecordInterface
     protected $collProductWishlistEntriesPartial;
 
     /**
+     * @var        ObjectCollection|ChildSale[] Collection to store aggregation of ChildSale objects.
+     */
+    protected $collSales;
+    protected $collSalesPartial;
+
+    /**
+     * @var        ObjectCollection|ChildSaleRating[] Collection to store aggregation of ChildSaleRating objects.
+     */
+    protected $collSaleRatingsRelatedByPostingUserId;
+    protected $collSaleRatingsRelatedByPostingUserIdPartial;
+
+    /**
+     * @var        ObjectCollection|ChildSaleRating[] Collection to store aggregation of ChildSaleRating objects.
+     */
+    protected $collSaleRatingsRelatedByRatingUserId;
+    protected $collSaleRatingsRelatedByRatingUserIdPartial;
+
+    /**
      * Flag to prevent endless save loop, if this object is referenced
      * by another object which falls in this transaction.
      *
@@ -164,6 +186,24 @@ abstract class User implements ActiveRecordInterface
      * @var ObjectCollection|ChildProductWishlistEntry[]
      */
     protected $productWishlistEntriesScheduledForDeletion = null;
+
+    /**
+     * An array of objects scheduled for deletion.
+     * @var ObjectCollection|ChildSale[]
+     */
+    protected $salesScheduledForDeletion = null;
+
+    /**
+     * An array of objects scheduled for deletion.
+     * @var ObjectCollection|ChildSaleRating[]
+     */
+    protected $saleRatingsRelatedByPostingUserIdScheduledForDeletion = null;
+
+    /**
+     * An array of objects scheduled for deletion.
+     * @var ObjectCollection|ChildSaleRating[]
+     */
+    protected $saleRatingsRelatedByRatingUserIdScheduledForDeletion = null;
 
     /**
      * Initializes internal state of Base\User object.
@@ -810,6 +850,12 @@ abstract class User implements ActiveRecordInterface
 
             $this->collProductWishlistEntries = null;
 
+            $this->collSales = null;
+
+            $this->collSaleRatingsRelatedByPostingUserId = null;
+
+            $this->collSaleRatingsRelatedByRatingUserId = null;
+
         } // if (deep)
     }
 
@@ -980,6 +1026,60 @@ abstract class User implements ActiveRecordInterface
 
             if ($this->collProductWishlistEntries !== null) {
                 foreach ($this->collProductWishlistEntries as $referrerFK) {
+                    if (!$referrerFK->isDeleted() && ($referrerFK->isNew() || $referrerFK->isModified())) {
+                        $affectedRows += $referrerFK->save($con);
+                    }
+                }
+            }
+
+            if ($this->salesScheduledForDeletion !== null) {
+                if (!$this->salesScheduledForDeletion->isEmpty()) {
+                    foreach ($this->salesScheduledForDeletion as $sale) {
+                        // need to save related object because we set the relation to null
+                        $sale->save($con);
+                    }
+                    $this->salesScheduledForDeletion = null;
+                }
+            }
+
+            if ($this->collSales !== null) {
+                foreach ($this->collSales as $referrerFK) {
+                    if (!$referrerFK->isDeleted() && ($referrerFK->isNew() || $referrerFK->isModified())) {
+                        $affectedRows += $referrerFK->save($con);
+                    }
+                }
+            }
+
+            if ($this->saleRatingsRelatedByPostingUserIdScheduledForDeletion !== null) {
+                if (!$this->saleRatingsRelatedByPostingUserIdScheduledForDeletion->isEmpty()) {
+                    foreach ($this->saleRatingsRelatedByPostingUserIdScheduledForDeletion as $saleRatingRelatedByPostingUserId) {
+                        // need to save related object because we set the relation to null
+                        $saleRatingRelatedByPostingUserId->save($con);
+                    }
+                    $this->saleRatingsRelatedByPostingUserIdScheduledForDeletion = null;
+                }
+            }
+
+            if ($this->collSaleRatingsRelatedByPostingUserId !== null) {
+                foreach ($this->collSaleRatingsRelatedByPostingUserId as $referrerFK) {
+                    if (!$referrerFK->isDeleted() && ($referrerFK->isNew() || $referrerFK->isModified())) {
+                        $affectedRows += $referrerFK->save($con);
+                    }
+                }
+            }
+
+            if ($this->saleRatingsRelatedByRatingUserIdScheduledForDeletion !== null) {
+                if (!$this->saleRatingsRelatedByRatingUserIdScheduledForDeletion->isEmpty()) {
+                    foreach ($this->saleRatingsRelatedByRatingUserIdScheduledForDeletion as $saleRatingRelatedByRatingUserId) {
+                        // need to save related object because we set the relation to null
+                        $saleRatingRelatedByRatingUserId->save($con);
+                    }
+                    $this->saleRatingsRelatedByRatingUserIdScheduledForDeletion = null;
+                }
+            }
+
+            if ($this->collSaleRatingsRelatedByRatingUserId !== null) {
+                foreach ($this->collSaleRatingsRelatedByRatingUserId as $referrerFK) {
                     if (!$referrerFK->isDeleted() && ($referrerFK->isNew() || $referrerFK->isModified())) {
                         $affectedRows += $referrerFK->save($con);
                     }
@@ -1222,6 +1322,15 @@ abstract class User implements ActiveRecordInterface
             }
             if (null !== $this->collProductWishlistEntries) {
                 $result['ProductWishlistEntries'] = $this->collProductWishlistEntries->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
+            }
+            if (null !== $this->collSales) {
+                $result['Sales'] = $this->collSales->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
+            }
+            if (null !== $this->collSaleRatingsRelatedByPostingUserId) {
+                $result['SaleRatingsRelatedByPostingUserId'] = $this->collSaleRatingsRelatedByPostingUserId->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
+            }
+            if (null !== $this->collSaleRatingsRelatedByRatingUserId) {
+                $result['SaleRatingsRelatedByRatingUserId'] = $this->collSaleRatingsRelatedByRatingUserId->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
             }
         }
 
@@ -1517,6 +1626,24 @@ abstract class User implements ActiveRecordInterface
                 }
             }
 
+            foreach ($this->getSales() as $relObj) {
+                if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
+                    $copyObj->addSale($relObj->copy($deepCopy));
+                }
+            }
+
+            foreach ($this->getSaleRatingsRelatedByPostingUserId() as $relObj) {
+                if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
+                    $copyObj->addSaleRatingRelatedByPostingUserId($relObj->copy($deepCopy));
+                }
+            }
+
+            foreach ($this->getSaleRatingsRelatedByRatingUserId() as $relObj) {
+                if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
+                    $copyObj->addSaleRatingRelatedByRatingUserId($relObj->copy($deepCopy));
+                }
+            }
+
         } // if ($deepCopy)
 
         if ($makeNew) {
@@ -1617,6 +1744,15 @@ abstract class User implements ActiveRecordInterface
         }
         if ('ProductWishlistEntry' == $relationName) {
             return $this->initProductWishlistEntries();
+        }
+        if ('Sale' == $relationName) {
+            return $this->initSales();
+        }
+        if ('SaleRatingRelatedByPostingUserId' == $relationName) {
+            return $this->initSaleRatingsRelatedByPostingUserId();
+        }
+        if ('SaleRatingRelatedByRatingUserId' == $relationName) {
+            return $this->initSaleRatingsRelatedByRatingUserId();
         }
     }
 
@@ -2300,6 +2436,735 @@ abstract class User implements ActiveRecordInterface
     }
 
     /**
+     * Clears out the collSales collection
+     *
+     * This does not modify the database; however, it will remove any associated objects, causing
+     * them to be refetched by subsequent calls to accessor method.
+     *
+     * @return void
+     * @see        addSales()
+     */
+    public function clearSales()
+    {
+        $this->collSales = null; // important to set this to NULL since that means it is uninitialized
+    }
+
+    /**
+     * Reset is the collSales collection loaded partially.
+     */
+    public function resetPartialSales($v = true)
+    {
+        $this->collSalesPartial = $v;
+    }
+
+    /**
+     * Initializes the collSales collection.
+     *
+     * By default this just sets the collSales collection to an empty array (like clearcollSales());
+     * however, you may wish to override this method in your stub class to provide setting appropriate
+     * to your application -- for example, setting the initial array to the values stored in database.
+     *
+     * @param      boolean $overrideExisting If set to true, the method call initializes
+     *                                        the collection even if it is not empty
+     *
+     * @return void
+     */
+    public function initSales($overrideExisting = true)
+    {
+        if (null !== $this->collSales && !$overrideExisting) {
+            return;
+        }
+        $this->collSales = new ObjectCollection();
+        $this->collSales->setModel('\Sale');
+    }
+
+    /**
+     * Gets an array of ChildSale objects which contain a foreign key that references this object.
+     *
+     * If the $criteria is not null, it is used to always fetch the results from the database.
+     * Otherwise the results are fetched from the database the first time, then cached.
+     * Next time the same method is called without $criteria, the cached collection is returned.
+     * If this ChildUser is new, it will return
+     * an empty collection or the current collection; the criteria is ignored on a new object.
+     *
+     * @param      Criteria $criteria optional Criteria object to narrow the query
+     * @param      ConnectionInterface $con optional connection object
+     * @return ObjectCollection|ChildSale[] List of ChildSale objects
+     * @throws PropelException
+     */
+    public function getSales(Criteria $criteria = null, ConnectionInterface $con = null)
+    {
+        $partial = $this->collSalesPartial && !$this->isNew();
+        if (null === $this->collSales || null !== $criteria  || $partial) {
+            if ($this->isNew() && null === $this->collSales) {
+                // return empty collection
+                $this->initSales();
+            } else {
+                $collSales = ChildSaleQuery::create(null, $criteria)
+                    ->filterByUser($this)
+                    ->find($con);
+
+                if (null !== $criteria) {
+                    if (false !== $this->collSalesPartial && count($collSales)) {
+                        $this->initSales(false);
+
+                        foreach ($collSales as $obj) {
+                            if (false == $this->collSales->contains($obj)) {
+                                $this->collSales->append($obj);
+                            }
+                        }
+
+                        $this->collSalesPartial = true;
+                    }
+
+                    return $collSales;
+                }
+
+                if ($partial && $this->collSales) {
+                    foreach ($this->collSales as $obj) {
+                        if ($obj->isNew()) {
+                            $collSales[] = $obj;
+                        }
+                    }
+                }
+
+                $this->collSales = $collSales;
+                $this->collSalesPartial = false;
+            }
+        }
+
+        return $this->collSales;
+    }
+
+    /**
+     * Sets a collection of ChildSale objects related by a one-to-many relationship
+     * to the current object.
+     * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
+     * and new objects from the given Propel collection.
+     *
+     * @param      Collection $sales A Propel collection.
+     * @param      ConnectionInterface $con Optional connection object
+     * @return $this|ChildUser The current object (for fluent API support)
+     */
+    public function setSales(Collection $sales, ConnectionInterface $con = null)
+    {
+        /** @var ChildSale[] $salesToDelete */
+        $salesToDelete = $this->getSales(new Criteria(), $con)->diff($sales);
+
+
+        $this->salesScheduledForDeletion = $salesToDelete;
+
+        foreach ($salesToDelete as $saleRemoved) {
+            $saleRemoved->setUser(null);
+        }
+
+        $this->collSales = null;
+        foreach ($sales as $sale) {
+            $this->addSale($sale);
+        }
+
+        $this->collSales = $sales;
+        $this->collSalesPartial = false;
+
+        return $this;
+    }
+
+    /**
+     * Returns the number of related Sale objects.
+     *
+     * @param      Criteria $criteria
+     * @param      boolean $distinct
+     * @param      ConnectionInterface $con
+     * @return int             Count of related Sale objects.
+     * @throws PropelException
+     */
+    public function countSales(Criteria $criteria = null, $distinct = false, ConnectionInterface $con = null)
+    {
+        $partial = $this->collSalesPartial && !$this->isNew();
+        if (null === $this->collSales || null !== $criteria || $partial) {
+            if ($this->isNew() && null === $this->collSales) {
+                return 0;
+            }
+
+            if ($partial && !$criteria) {
+                return count($this->getSales());
+            }
+
+            $query = ChildSaleQuery::create(null, $criteria);
+            if ($distinct) {
+                $query->distinct();
+            }
+
+            return $query
+                ->filterByUser($this)
+                ->count($con);
+        }
+
+        return count($this->collSales);
+    }
+
+    /**
+     * Method called to associate a ChildSale object to this object
+     * through the ChildSale foreign key attribute.
+     *
+     * @param  ChildSale $l ChildSale
+     * @return $this|\User The current object (for fluent API support)
+     */
+    public function addSale(ChildSale $l)
+    {
+        if ($this->collSales === null) {
+            $this->initSales();
+            $this->collSalesPartial = true;
+        }
+
+        if (!$this->collSales->contains($l)) {
+            $this->doAddSale($l);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param ChildSale $sale The ChildSale object to add.
+     */
+    protected function doAddSale(ChildSale $sale)
+    {
+        $this->collSales[]= $sale;
+        $sale->setUser($this);
+    }
+
+    /**
+     * @param  ChildSale $sale The ChildSale object to remove.
+     * @return $this|ChildUser The current object (for fluent API support)
+     */
+    public function removeSale(ChildSale $sale)
+    {
+        if ($this->getSales()->contains($sale)) {
+            $pos = $this->collSales->search($sale);
+            $this->collSales->remove($pos);
+            if (null === $this->salesScheduledForDeletion) {
+                $this->salesScheduledForDeletion = clone $this->collSales;
+                $this->salesScheduledForDeletion->clear();
+            }
+            $this->salesScheduledForDeletion[]= $sale;
+            $sale->setUser(null);
+        }
+
+        return $this;
+    }
+
+
+    /**
+     * If this collection has already been initialized with
+     * an identical criteria, it returns the collection.
+     * Otherwise if this User is new, it will return
+     * an empty collection; or if this User has previously
+     * been saved, it will retrieve related Sales from storage.
+     *
+     * This method is protected by default in order to keep the public
+     * api reasonable.  You can provide public methods for those you
+     * actually need in User.
+     *
+     * @param      Criteria $criteria optional Criteria object to narrow the query
+     * @param      ConnectionInterface $con optional connection object
+     * @param      string $joinBehavior optional join type to use (defaults to Criteria::LEFT_JOIN)
+     * @return ObjectCollection|ChildSale[] List of ChildSale objects
+     */
+    public function getSalesJoinProduct(Criteria $criteria = null, ConnectionInterface $con = null, $joinBehavior = Criteria::LEFT_JOIN)
+    {
+        $query = ChildSaleQuery::create(null, $criteria);
+        $query->joinWith('Product', $joinBehavior);
+
+        return $this->getSales($query, $con);
+    }
+
+    /**
+     * Clears out the collSaleRatingsRelatedByPostingUserId collection
+     *
+     * This does not modify the database; however, it will remove any associated objects, causing
+     * them to be refetched by subsequent calls to accessor method.
+     *
+     * @return void
+     * @see        addSaleRatingsRelatedByPostingUserId()
+     */
+    public function clearSaleRatingsRelatedByPostingUserId()
+    {
+        $this->collSaleRatingsRelatedByPostingUserId = null; // important to set this to NULL since that means it is uninitialized
+    }
+
+    /**
+     * Reset is the collSaleRatingsRelatedByPostingUserId collection loaded partially.
+     */
+    public function resetPartialSaleRatingsRelatedByPostingUserId($v = true)
+    {
+        $this->collSaleRatingsRelatedByPostingUserIdPartial = $v;
+    }
+
+    /**
+     * Initializes the collSaleRatingsRelatedByPostingUserId collection.
+     *
+     * By default this just sets the collSaleRatingsRelatedByPostingUserId collection to an empty array (like clearcollSaleRatingsRelatedByPostingUserId());
+     * however, you may wish to override this method in your stub class to provide setting appropriate
+     * to your application -- for example, setting the initial array to the values stored in database.
+     *
+     * @param      boolean $overrideExisting If set to true, the method call initializes
+     *                                        the collection even if it is not empty
+     *
+     * @return void
+     */
+    public function initSaleRatingsRelatedByPostingUserId($overrideExisting = true)
+    {
+        if (null !== $this->collSaleRatingsRelatedByPostingUserId && !$overrideExisting) {
+            return;
+        }
+        $this->collSaleRatingsRelatedByPostingUserId = new ObjectCollection();
+        $this->collSaleRatingsRelatedByPostingUserId->setModel('\SaleRating');
+    }
+
+    /**
+     * Gets an array of ChildSaleRating objects which contain a foreign key that references this object.
+     *
+     * If the $criteria is not null, it is used to always fetch the results from the database.
+     * Otherwise the results are fetched from the database the first time, then cached.
+     * Next time the same method is called without $criteria, the cached collection is returned.
+     * If this ChildUser is new, it will return
+     * an empty collection or the current collection; the criteria is ignored on a new object.
+     *
+     * @param      Criteria $criteria optional Criteria object to narrow the query
+     * @param      ConnectionInterface $con optional connection object
+     * @return ObjectCollection|ChildSaleRating[] List of ChildSaleRating objects
+     * @throws PropelException
+     */
+    public function getSaleRatingsRelatedByPostingUserId(Criteria $criteria = null, ConnectionInterface $con = null)
+    {
+        $partial = $this->collSaleRatingsRelatedByPostingUserIdPartial && !$this->isNew();
+        if (null === $this->collSaleRatingsRelatedByPostingUserId || null !== $criteria  || $partial) {
+            if ($this->isNew() && null === $this->collSaleRatingsRelatedByPostingUserId) {
+                // return empty collection
+                $this->initSaleRatingsRelatedByPostingUserId();
+            } else {
+                $collSaleRatingsRelatedByPostingUserId = ChildSaleRatingQuery::create(null, $criteria)
+                    ->filterByUserRelatedByPostingUserId($this)
+                    ->find($con);
+
+                if (null !== $criteria) {
+                    if (false !== $this->collSaleRatingsRelatedByPostingUserIdPartial && count($collSaleRatingsRelatedByPostingUserId)) {
+                        $this->initSaleRatingsRelatedByPostingUserId(false);
+
+                        foreach ($collSaleRatingsRelatedByPostingUserId as $obj) {
+                            if (false == $this->collSaleRatingsRelatedByPostingUserId->contains($obj)) {
+                                $this->collSaleRatingsRelatedByPostingUserId->append($obj);
+                            }
+                        }
+
+                        $this->collSaleRatingsRelatedByPostingUserIdPartial = true;
+                    }
+
+                    return $collSaleRatingsRelatedByPostingUserId;
+                }
+
+                if ($partial && $this->collSaleRatingsRelatedByPostingUserId) {
+                    foreach ($this->collSaleRatingsRelatedByPostingUserId as $obj) {
+                        if ($obj->isNew()) {
+                            $collSaleRatingsRelatedByPostingUserId[] = $obj;
+                        }
+                    }
+                }
+
+                $this->collSaleRatingsRelatedByPostingUserId = $collSaleRatingsRelatedByPostingUserId;
+                $this->collSaleRatingsRelatedByPostingUserIdPartial = false;
+            }
+        }
+
+        return $this->collSaleRatingsRelatedByPostingUserId;
+    }
+
+    /**
+     * Sets a collection of ChildSaleRating objects related by a one-to-many relationship
+     * to the current object.
+     * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
+     * and new objects from the given Propel collection.
+     *
+     * @param      Collection $saleRatingsRelatedByPostingUserId A Propel collection.
+     * @param      ConnectionInterface $con Optional connection object
+     * @return $this|ChildUser The current object (for fluent API support)
+     */
+    public function setSaleRatingsRelatedByPostingUserId(Collection $saleRatingsRelatedByPostingUserId, ConnectionInterface $con = null)
+    {
+        /** @var ChildSaleRating[] $saleRatingsRelatedByPostingUserIdToDelete */
+        $saleRatingsRelatedByPostingUserIdToDelete = $this->getSaleRatingsRelatedByPostingUserId(new Criteria(), $con)->diff($saleRatingsRelatedByPostingUserId);
+
+
+        $this->saleRatingsRelatedByPostingUserIdScheduledForDeletion = $saleRatingsRelatedByPostingUserIdToDelete;
+
+        foreach ($saleRatingsRelatedByPostingUserIdToDelete as $saleRatingRelatedByPostingUserIdRemoved) {
+            $saleRatingRelatedByPostingUserIdRemoved->setUserRelatedByPostingUserId(null);
+        }
+
+        $this->collSaleRatingsRelatedByPostingUserId = null;
+        foreach ($saleRatingsRelatedByPostingUserId as $saleRatingRelatedByPostingUserId) {
+            $this->addSaleRatingRelatedByPostingUserId($saleRatingRelatedByPostingUserId);
+        }
+
+        $this->collSaleRatingsRelatedByPostingUserId = $saleRatingsRelatedByPostingUserId;
+        $this->collSaleRatingsRelatedByPostingUserIdPartial = false;
+
+        return $this;
+    }
+
+    /**
+     * Returns the number of related SaleRating objects.
+     *
+     * @param      Criteria $criteria
+     * @param      boolean $distinct
+     * @param      ConnectionInterface $con
+     * @return int             Count of related SaleRating objects.
+     * @throws PropelException
+     */
+    public function countSaleRatingsRelatedByPostingUserId(Criteria $criteria = null, $distinct = false, ConnectionInterface $con = null)
+    {
+        $partial = $this->collSaleRatingsRelatedByPostingUserIdPartial && !$this->isNew();
+        if (null === $this->collSaleRatingsRelatedByPostingUserId || null !== $criteria || $partial) {
+            if ($this->isNew() && null === $this->collSaleRatingsRelatedByPostingUserId) {
+                return 0;
+            }
+
+            if ($partial && !$criteria) {
+                return count($this->getSaleRatingsRelatedByPostingUserId());
+            }
+
+            $query = ChildSaleRatingQuery::create(null, $criteria);
+            if ($distinct) {
+                $query->distinct();
+            }
+
+            return $query
+                ->filterByUserRelatedByPostingUserId($this)
+                ->count($con);
+        }
+
+        return count($this->collSaleRatingsRelatedByPostingUserId);
+    }
+
+    /**
+     * Method called to associate a ChildSaleRating object to this object
+     * through the ChildSaleRating foreign key attribute.
+     *
+     * @param  ChildSaleRating $l ChildSaleRating
+     * @return $this|\User The current object (for fluent API support)
+     */
+    public function addSaleRatingRelatedByPostingUserId(ChildSaleRating $l)
+    {
+        if ($this->collSaleRatingsRelatedByPostingUserId === null) {
+            $this->initSaleRatingsRelatedByPostingUserId();
+            $this->collSaleRatingsRelatedByPostingUserIdPartial = true;
+        }
+
+        if (!$this->collSaleRatingsRelatedByPostingUserId->contains($l)) {
+            $this->doAddSaleRatingRelatedByPostingUserId($l);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param ChildSaleRating $saleRatingRelatedByPostingUserId The ChildSaleRating object to add.
+     */
+    protected function doAddSaleRatingRelatedByPostingUserId(ChildSaleRating $saleRatingRelatedByPostingUserId)
+    {
+        $this->collSaleRatingsRelatedByPostingUserId[]= $saleRatingRelatedByPostingUserId;
+        $saleRatingRelatedByPostingUserId->setUserRelatedByPostingUserId($this);
+    }
+
+    /**
+     * @param  ChildSaleRating $saleRatingRelatedByPostingUserId The ChildSaleRating object to remove.
+     * @return $this|ChildUser The current object (for fluent API support)
+     */
+    public function removeSaleRatingRelatedByPostingUserId(ChildSaleRating $saleRatingRelatedByPostingUserId)
+    {
+        if ($this->getSaleRatingsRelatedByPostingUserId()->contains($saleRatingRelatedByPostingUserId)) {
+            $pos = $this->collSaleRatingsRelatedByPostingUserId->search($saleRatingRelatedByPostingUserId);
+            $this->collSaleRatingsRelatedByPostingUserId->remove($pos);
+            if (null === $this->saleRatingsRelatedByPostingUserIdScheduledForDeletion) {
+                $this->saleRatingsRelatedByPostingUserIdScheduledForDeletion = clone $this->collSaleRatingsRelatedByPostingUserId;
+                $this->saleRatingsRelatedByPostingUserIdScheduledForDeletion->clear();
+            }
+            $this->saleRatingsRelatedByPostingUserIdScheduledForDeletion[]= $saleRatingRelatedByPostingUserId;
+            $saleRatingRelatedByPostingUserId->setUserRelatedByPostingUserId(null);
+        }
+
+        return $this;
+    }
+
+
+    /**
+     * If this collection has already been initialized with
+     * an identical criteria, it returns the collection.
+     * Otherwise if this User is new, it will return
+     * an empty collection; or if this User has previously
+     * been saved, it will retrieve related SaleRatingsRelatedByPostingUserId from storage.
+     *
+     * This method is protected by default in order to keep the public
+     * api reasonable.  You can provide public methods for those you
+     * actually need in User.
+     *
+     * @param      Criteria $criteria optional Criteria object to narrow the query
+     * @param      ConnectionInterface $con optional connection object
+     * @param      string $joinBehavior optional join type to use (defaults to Criteria::LEFT_JOIN)
+     * @return ObjectCollection|ChildSaleRating[] List of ChildSaleRating objects
+     */
+    public function getSaleRatingsRelatedByPostingUserIdJoinSale(Criteria $criteria = null, ConnectionInterface $con = null, $joinBehavior = Criteria::LEFT_JOIN)
+    {
+        $query = ChildSaleRatingQuery::create(null, $criteria);
+        $query->joinWith('Sale', $joinBehavior);
+
+        return $this->getSaleRatingsRelatedByPostingUserId($query, $con);
+    }
+
+    /**
+     * Clears out the collSaleRatingsRelatedByRatingUserId collection
+     *
+     * This does not modify the database; however, it will remove any associated objects, causing
+     * them to be refetched by subsequent calls to accessor method.
+     *
+     * @return void
+     * @see        addSaleRatingsRelatedByRatingUserId()
+     */
+    public function clearSaleRatingsRelatedByRatingUserId()
+    {
+        $this->collSaleRatingsRelatedByRatingUserId = null; // important to set this to NULL since that means it is uninitialized
+    }
+
+    /**
+     * Reset is the collSaleRatingsRelatedByRatingUserId collection loaded partially.
+     */
+    public function resetPartialSaleRatingsRelatedByRatingUserId($v = true)
+    {
+        $this->collSaleRatingsRelatedByRatingUserIdPartial = $v;
+    }
+
+    /**
+     * Initializes the collSaleRatingsRelatedByRatingUserId collection.
+     *
+     * By default this just sets the collSaleRatingsRelatedByRatingUserId collection to an empty array (like clearcollSaleRatingsRelatedByRatingUserId());
+     * however, you may wish to override this method in your stub class to provide setting appropriate
+     * to your application -- for example, setting the initial array to the values stored in database.
+     *
+     * @param      boolean $overrideExisting If set to true, the method call initializes
+     *                                        the collection even if it is not empty
+     *
+     * @return void
+     */
+    public function initSaleRatingsRelatedByRatingUserId($overrideExisting = true)
+    {
+        if (null !== $this->collSaleRatingsRelatedByRatingUserId && !$overrideExisting) {
+            return;
+        }
+        $this->collSaleRatingsRelatedByRatingUserId = new ObjectCollection();
+        $this->collSaleRatingsRelatedByRatingUserId->setModel('\SaleRating');
+    }
+
+    /**
+     * Gets an array of ChildSaleRating objects which contain a foreign key that references this object.
+     *
+     * If the $criteria is not null, it is used to always fetch the results from the database.
+     * Otherwise the results are fetched from the database the first time, then cached.
+     * Next time the same method is called without $criteria, the cached collection is returned.
+     * If this ChildUser is new, it will return
+     * an empty collection or the current collection; the criteria is ignored on a new object.
+     *
+     * @param      Criteria $criteria optional Criteria object to narrow the query
+     * @param      ConnectionInterface $con optional connection object
+     * @return ObjectCollection|ChildSaleRating[] List of ChildSaleRating objects
+     * @throws PropelException
+     */
+    public function getSaleRatingsRelatedByRatingUserId(Criteria $criteria = null, ConnectionInterface $con = null)
+    {
+        $partial = $this->collSaleRatingsRelatedByRatingUserIdPartial && !$this->isNew();
+        if (null === $this->collSaleRatingsRelatedByRatingUserId || null !== $criteria  || $partial) {
+            if ($this->isNew() && null === $this->collSaleRatingsRelatedByRatingUserId) {
+                // return empty collection
+                $this->initSaleRatingsRelatedByRatingUserId();
+            } else {
+                $collSaleRatingsRelatedByRatingUserId = ChildSaleRatingQuery::create(null, $criteria)
+                    ->filterByUserRelatedByRatingUserId($this)
+                    ->find($con);
+
+                if (null !== $criteria) {
+                    if (false !== $this->collSaleRatingsRelatedByRatingUserIdPartial && count($collSaleRatingsRelatedByRatingUserId)) {
+                        $this->initSaleRatingsRelatedByRatingUserId(false);
+
+                        foreach ($collSaleRatingsRelatedByRatingUserId as $obj) {
+                            if (false == $this->collSaleRatingsRelatedByRatingUserId->contains($obj)) {
+                                $this->collSaleRatingsRelatedByRatingUserId->append($obj);
+                            }
+                        }
+
+                        $this->collSaleRatingsRelatedByRatingUserIdPartial = true;
+                    }
+
+                    return $collSaleRatingsRelatedByRatingUserId;
+                }
+
+                if ($partial && $this->collSaleRatingsRelatedByRatingUserId) {
+                    foreach ($this->collSaleRatingsRelatedByRatingUserId as $obj) {
+                        if ($obj->isNew()) {
+                            $collSaleRatingsRelatedByRatingUserId[] = $obj;
+                        }
+                    }
+                }
+
+                $this->collSaleRatingsRelatedByRatingUserId = $collSaleRatingsRelatedByRatingUserId;
+                $this->collSaleRatingsRelatedByRatingUserIdPartial = false;
+            }
+        }
+
+        return $this->collSaleRatingsRelatedByRatingUserId;
+    }
+
+    /**
+     * Sets a collection of ChildSaleRating objects related by a one-to-many relationship
+     * to the current object.
+     * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
+     * and new objects from the given Propel collection.
+     *
+     * @param      Collection $saleRatingsRelatedByRatingUserId A Propel collection.
+     * @param      ConnectionInterface $con Optional connection object
+     * @return $this|ChildUser The current object (for fluent API support)
+     */
+    public function setSaleRatingsRelatedByRatingUserId(Collection $saleRatingsRelatedByRatingUserId, ConnectionInterface $con = null)
+    {
+        /** @var ChildSaleRating[] $saleRatingsRelatedByRatingUserIdToDelete */
+        $saleRatingsRelatedByRatingUserIdToDelete = $this->getSaleRatingsRelatedByRatingUserId(new Criteria(), $con)->diff($saleRatingsRelatedByRatingUserId);
+
+
+        $this->saleRatingsRelatedByRatingUserIdScheduledForDeletion = $saleRatingsRelatedByRatingUserIdToDelete;
+
+        foreach ($saleRatingsRelatedByRatingUserIdToDelete as $saleRatingRelatedByRatingUserIdRemoved) {
+            $saleRatingRelatedByRatingUserIdRemoved->setUserRelatedByRatingUserId(null);
+        }
+
+        $this->collSaleRatingsRelatedByRatingUserId = null;
+        foreach ($saleRatingsRelatedByRatingUserId as $saleRatingRelatedByRatingUserId) {
+            $this->addSaleRatingRelatedByRatingUserId($saleRatingRelatedByRatingUserId);
+        }
+
+        $this->collSaleRatingsRelatedByRatingUserId = $saleRatingsRelatedByRatingUserId;
+        $this->collSaleRatingsRelatedByRatingUserIdPartial = false;
+
+        return $this;
+    }
+
+    /**
+     * Returns the number of related SaleRating objects.
+     *
+     * @param      Criteria $criteria
+     * @param      boolean $distinct
+     * @param      ConnectionInterface $con
+     * @return int             Count of related SaleRating objects.
+     * @throws PropelException
+     */
+    public function countSaleRatingsRelatedByRatingUserId(Criteria $criteria = null, $distinct = false, ConnectionInterface $con = null)
+    {
+        $partial = $this->collSaleRatingsRelatedByRatingUserIdPartial && !$this->isNew();
+        if (null === $this->collSaleRatingsRelatedByRatingUserId || null !== $criteria || $partial) {
+            if ($this->isNew() && null === $this->collSaleRatingsRelatedByRatingUserId) {
+                return 0;
+            }
+
+            if ($partial && !$criteria) {
+                return count($this->getSaleRatingsRelatedByRatingUserId());
+            }
+
+            $query = ChildSaleRatingQuery::create(null, $criteria);
+            if ($distinct) {
+                $query->distinct();
+            }
+
+            return $query
+                ->filterByUserRelatedByRatingUserId($this)
+                ->count($con);
+        }
+
+        return count($this->collSaleRatingsRelatedByRatingUserId);
+    }
+
+    /**
+     * Method called to associate a ChildSaleRating object to this object
+     * through the ChildSaleRating foreign key attribute.
+     *
+     * @param  ChildSaleRating $l ChildSaleRating
+     * @return $this|\User The current object (for fluent API support)
+     */
+    public function addSaleRatingRelatedByRatingUserId(ChildSaleRating $l)
+    {
+        if ($this->collSaleRatingsRelatedByRatingUserId === null) {
+            $this->initSaleRatingsRelatedByRatingUserId();
+            $this->collSaleRatingsRelatedByRatingUserIdPartial = true;
+        }
+
+        if (!$this->collSaleRatingsRelatedByRatingUserId->contains($l)) {
+            $this->doAddSaleRatingRelatedByRatingUserId($l);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param ChildSaleRating $saleRatingRelatedByRatingUserId The ChildSaleRating object to add.
+     */
+    protected function doAddSaleRatingRelatedByRatingUserId(ChildSaleRating $saleRatingRelatedByRatingUserId)
+    {
+        $this->collSaleRatingsRelatedByRatingUserId[]= $saleRatingRelatedByRatingUserId;
+        $saleRatingRelatedByRatingUserId->setUserRelatedByRatingUserId($this);
+    }
+
+    /**
+     * @param  ChildSaleRating $saleRatingRelatedByRatingUserId The ChildSaleRating object to remove.
+     * @return $this|ChildUser The current object (for fluent API support)
+     */
+    public function removeSaleRatingRelatedByRatingUserId(ChildSaleRating $saleRatingRelatedByRatingUserId)
+    {
+        if ($this->getSaleRatingsRelatedByRatingUserId()->contains($saleRatingRelatedByRatingUserId)) {
+            $pos = $this->collSaleRatingsRelatedByRatingUserId->search($saleRatingRelatedByRatingUserId);
+            $this->collSaleRatingsRelatedByRatingUserId->remove($pos);
+            if (null === $this->saleRatingsRelatedByRatingUserIdScheduledForDeletion) {
+                $this->saleRatingsRelatedByRatingUserIdScheduledForDeletion = clone $this->collSaleRatingsRelatedByRatingUserId;
+                $this->saleRatingsRelatedByRatingUserIdScheduledForDeletion->clear();
+            }
+            $this->saleRatingsRelatedByRatingUserIdScheduledForDeletion[]= $saleRatingRelatedByRatingUserId;
+            $saleRatingRelatedByRatingUserId->setUserRelatedByRatingUserId(null);
+        }
+
+        return $this;
+    }
+
+
+    /**
+     * If this collection has already been initialized with
+     * an identical criteria, it returns the collection.
+     * Otherwise if this User is new, it will return
+     * an empty collection; or if this User has previously
+     * been saved, it will retrieve related SaleRatingsRelatedByRatingUserId from storage.
+     *
+     * This method is protected by default in order to keep the public
+     * api reasonable.  You can provide public methods for those you
+     * actually need in User.
+     *
+     * @param      Criteria $criteria optional Criteria object to narrow the query
+     * @param      ConnectionInterface $con optional connection object
+     * @param      string $joinBehavior optional join type to use (defaults to Criteria::LEFT_JOIN)
+     * @return ObjectCollection|ChildSaleRating[] List of ChildSaleRating objects
+     */
+    public function getSaleRatingsRelatedByRatingUserIdJoinSale(Criteria $criteria = null, ConnectionInterface $con = null, $joinBehavior = Criteria::LEFT_JOIN)
+    {
+        $query = ChildSaleRatingQuery::create(null, $criteria);
+        $query->joinWith('Sale', $joinBehavior);
+
+        return $this->getSaleRatingsRelatedByRatingUserId($query, $con);
+    }
+
+    /**
      * Clears the current object, sets all attributes to their default values and removes
      * outgoing references as well as back-references (from other objects to this one. Results probably in a database
      * change of those foreign objects when you call `save` there).
@@ -2351,11 +3216,29 @@ abstract class User implements ActiveRecordInterface
                     $o->clearAllReferences($deep);
                 }
             }
+            if ($this->collSales) {
+                foreach ($this->collSales as $o) {
+                    $o->clearAllReferences($deep);
+                }
+            }
+            if ($this->collSaleRatingsRelatedByPostingUserId) {
+                foreach ($this->collSaleRatingsRelatedByPostingUserId as $o) {
+                    $o->clearAllReferences($deep);
+                }
+            }
+            if ($this->collSaleRatingsRelatedByRatingUserId) {
+                foreach ($this->collSaleRatingsRelatedByRatingUserId as $o) {
+                    $o->clearAllReferences($deep);
+                }
+            }
         } // if ($deep)
 
         $this->collFriendshipsRelatedByFriend2 = null;
         $this->collFriendshipsRelatedByFriend1 = null;
         $this->collProductWishlistEntries = null;
+        $this->collSales = null;
+        $this->collSaleRatingsRelatedByPostingUserId = null;
+        $this->collSaleRatingsRelatedByRatingUserId = null;
         $this->aPrivilegeType = null;
     }
 

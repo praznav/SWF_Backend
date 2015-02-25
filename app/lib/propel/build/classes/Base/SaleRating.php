@@ -2,13 +2,14 @@
 
 namespace Base;
 
-use \FriendshipQuery as ChildFriendshipQuery;
+use \Sale as ChildSale;
+use \SaleQuery as ChildSaleQuery;
+use \SaleRatingQuery as ChildSaleRatingQuery;
 use \User as ChildUser;
 use \UserQuery as ChildUserQuery;
-use \DateTime;
 use \Exception;
 use \PDO;
-use Map\FriendshipTableMap;
+use Map\SaleRatingTableMap;
 use Propel\Runtime\Propel;
 use Propel\Runtime\ActiveQuery\Criteria;
 use Propel\Runtime\ActiveQuery\ModelCriteria;
@@ -20,14 +21,13 @@ use Propel\Runtime\Exception\LogicException;
 use Propel\Runtime\Exception\PropelException;
 use Propel\Runtime\Map\TableMap;
 use Propel\Runtime\Parser\AbstractParser;
-use Propel\Runtime\Util\PropelDateTime;
 
-abstract class Friendship implements ActiveRecordInterface
+abstract class SaleRating implements ActiveRecordInterface
 {
     /**
      * TableMap class name
      */
-    const TABLE_MAP = '\\Map\\FriendshipTableMap';
+    const TABLE_MAP = '\\Map\\SaleRatingTableMap';
 
 
     /**
@@ -57,38 +57,55 @@ abstract class Friendship implements ActiveRecordInterface
     protected $virtualColumns = array();
 
     /**
-     * The value for the friendship_id field.
+     * The value for the sale_rating_id field.
      * @var        string
      */
-    protected $friendship_id;
+    protected $sale_rating_id;
 
     /**
-     * The value for the invite_date field.
-     * @var        \DateTime
+     * The value for the rating field.
+     * @var        int
      */
-    protected $invite_date;
+    protected $rating;
 
     /**
-     * The value for the friend1 field.
+     * The value for the message field.
      * @var        string
      */
-    protected $friend1;
+    protected $message;
 
     /**
-     * The value for the friend2 field.
+     * The value for the sale_id field.
      * @var        string
      */
-    protected $friend2;
+    protected $sale_id;
+
+    /**
+     * The value for the rating_user_id field.
+     * @var        string
+     */
+    protected $rating_user_id;
+
+    /**
+     * The value for the posting_user_id field.
+     * @var        string
+     */
+    protected $posting_user_id;
 
     /**
      * @var        ChildUser
      */
-    protected $aUserRelatedByFriend2;
+    protected $aUserRelatedByPostingUserId;
+
+    /**
+     * @var        ChildSale
+     */
+    protected $aSale;
 
     /**
      * @var        ChildUser
      */
-    protected $aUserRelatedByFriend1;
+    protected $aUserRelatedByRatingUserId;
 
     /**
      * Flag to prevent endless save loop, if this object is referenced
@@ -99,7 +116,7 @@ abstract class Friendship implements ActiveRecordInterface
     protected $alreadyInSave = false;
 
     /**
-     * Initializes internal state of Base\Friendship object.
+     * Initializes internal state of Base\SaleRating object.
      */
     public function __construct()
     {
@@ -194,9 +211,9 @@ abstract class Friendship implements ActiveRecordInterface
     }
 
     /**
-     * Compares this with another <code>Friendship</code> instance.  If
-     * <code>obj</code> is an instance of <code>Friendship</code>, delegates to
-     * <code>equals(Friendship)</code>.  Otherwise, returns <code>false</code>.
+     * Compares this with another <code>SaleRating</code> instance.  If
+     * <code>obj</code> is an instance of <code>SaleRating</code>, delegates to
+     * <code>equals(SaleRating)</code>.  Otherwise, returns <code>false</code>.
      *
      * @param  mixed   $obj The object to compare to.
      * @return boolean Whether equal to the object specified.
@@ -262,7 +279,7 @@ abstract class Friendship implements ActiveRecordInterface
      * @param string $name  The virtual column name
      * @param mixed  $value The value to give to the virtual column
      *
-     * @return $this|Friendship The current object, for fluid interface
+     * @return $this|SaleRating The current object, for fluid interface
      */
     public function setVirtualColumn($name, $value)
     {
@@ -316,53 +333,63 @@ abstract class Friendship implements ActiveRecordInterface
     }
 
     /**
-     * Get the [friendship_id] column value.
+     * Get the [sale_rating_id] column value.
      *
      * @return string
      */
-    public function getFriendshipId()
+    public function getSaleRatingId()
     {
-        return $this->friendship_id;
+        return $this->sale_rating_id;
     }
 
     /**
-     * Get the [optionally formatted] temporal [invite_date] column value.
+     * Get the [rating] column value.
      *
-     *
-     * @param      string $format The date/time format string (either date()-style or strftime()-style).
-     *                            If format is NULL, then the raw \DateTime object will be returned.
-     *
-     * @return string|\DateTime Formatted date/time value as string or \DateTime object (if format is NULL), NULL if column is NULL, and 0 if column value is 0000-00-00 00:00:00
-     *
-     * @throws PropelException - if unable to parse/validate the date/time value.
+     * @return int
      */
-    public function getInviteDate($format = NULL)
+    public function getRating()
     {
-        if ($format === null) {
-            return $this->invite_date;
-        } else {
-            return $this->invite_date instanceof \DateTime ? $this->invite_date->format($format) : null;
-        }
+        return $this->rating;
     }
 
     /**
-     * Get the [friend1] column value.
+     * Get the [message] column value.
      *
      * @return string
      */
-    public function getFriend1()
+    public function getMessage()
     {
-        return $this->friend1;
+        return $this->message;
     }
 
     /**
-     * Get the [friend2] column value.
+     * Get the [sale_id] column value.
      *
      * @return string
      */
-    public function getFriend2()
+    public function getSaleId()
     {
-        return $this->friend2;
+        return $this->sale_id;
+    }
+
+    /**
+     * Get the [rating_user_id] column value.
+     *
+     * @return string
+     */
+    public function getRatingUserId()
+    {
+        return $this->rating_user_id;
+    }
+
+    /**
+     * Get the [posting_user_id] column value.
+     *
+     * @return string
+     */
+    public function getPostingUserId()
+    {
+        return $this->posting_user_id;
     }
 
     /**
@@ -401,20 +428,23 @@ abstract class Friendship implements ActiveRecordInterface
     {
         try {
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 0 + $startcol : FriendshipTableMap::translateFieldName('FriendshipId', TableMap::TYPE_PHPNAME, $indexType)];
-            $this->friendship_id = (null !== $col) ? (string) $col : null;
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 0 + $startcol : SaleRatingTableMap::translateFieldName('SaleRatingId', TableMap::TYPE_PHPNAME, $indexType)];
+            $this->sale_rating_id = (null !== $col) ? (string) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 1 + $startcol : FriendshipTableMap::translateFieldName('InviteDate', TableMap::TYPE_PHPNAME, $indexType)];
-            if ($col === '0000-00-00 00:00:00') {
-                $col = null;
-            }
-            $this->invite_date = (null !== $col) ? PropelDateTime::newInstance($col, null, '\DateTime') : null;
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 1 + $startcol : SaleRatingTableMap::translateFieldName('Rating', TableMap::TYPE_PHPNAME, $indexType)];
+            $this->rating = (null !== $col) ? (int) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 2 + $startcol : FriendshipTableMap::translateFieldName('Friend1', TableMap::TYPE_PHPNAME, $indexType)];
-            $this->friend1 = (null !== $col) ? (string) $col : null;
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 2 + $startcol : SaleRatingTableMap::translateFieldName('Message', TableMap::TYPE_PHPNAME, $indexType)];
+            $this->message = (null !== $col) ? (string) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 3 + $startcol : FriendshipTableMap::translateFieldName('Friend2', TableMap::TYPE_PHPNAME, $indexType)];
-            $this->friend2 = (null !== $col) ? (string) $col : null;
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 3 + $startcol : SaleRatingTableMap::translateFieldName('SaleId', TableMap::TYPE_PHPNAME, $indexType)];
+            $this->sale_id = (null !== $col) ? (string) $col : null;
+
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 4 + $startcol : SaleRatingTableMap::translateFieldName('RatingUserId', TableMap::TYPE_PHPNAME, $indexType)];
+            $this->rating_user_id = (null !== $col) ? (string) $col : null;
+
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 5 + $startcol : SaleRatingTableMap::translateFieldName('PostingUserId', TableMap::TYPE_PHPNAME, $indexType)];
+            $this->posting_user_id = (null !== $col) ? (string) $col : null;
             $this->resetModified();
 
             $this->setNew(false);
@@ -423,10 +453,10 @@ abstract class Friendship implements ActiveRecordInterface
                 $this->ensureConsistency();
             }
 
-            return $startcol + 4; // 4 = FriendshipTableMap::NUM_HYDRATE_COLUMNS.
+            return $startcol + 6; // 6 = SaleRatingTableMap::NUM_HYDRATE_COLUMNS.
 
         } catch (Exception $e) {
-            throw new PropelException(sprintf('Error populating %s object', '\\Friendship'), 0, $e);
+            throw new PropelException(sprintf('Error populating %s object', '\\SaleRating'), 0, $e);
         }
     }
 
@@ -445,101 +475,148 @@ abstract class Friendship implements ActiveRecordInterface
      */
     public function ensureConsistency()
     {
-        if ($this->aUserRelatedByFriend1 !== null && $this->friend1 !== $this->aUserRelatedByFriend1->getUserId()) {
-            $this->aUserRelatedByFriend1 = null;
+        if ($this->aSale !== null && $this->sale_id !== $this->aSale->getSaleId()) {
+            $this->aSale = null;
         }
-        if ($this->aUserRelatedByFriend2 !== null && $this->friend2 !== $this->aUserRelatedByFriend2->getUserId()) {
-            $this->aUserRelatedByFriend2 = null;
+        if ($this->aUserRelatedByRatingUserId !== null && $this->rating_user_id !== $this->aUserRelatedByRatingUserId->getUserId()) {
+            $this->aUserRelatedByRatingUserId = null;
+        }
+        if ($this->aUserRelatedByPostingUserId !== null && $this->posting_user_id !== $this->aUserRelatedByPostingUserId->getUserId()) {
+            $this->aUserRelatedByPostingUserId = null;
         }
     } // ensureConsistency
 
     /**
-     * Set the value of [friendship_id] column.
+     * Set the value of [sale_rating_id] column.
      *
      * @param  string $v new value
-     * @return $this|\Friendship The current object (for fluent API support)
+     * @return $this|\SaleRating The current object (for fluent API support)
      */
-    public function setFriendshipId($v)
+    public function setSaleRatingId($v)
     {
         if ($v !== null) {
             $v = (string) $v;
         }
 
-        if ($this->friendship_id !== $v) {
-            $this->friendship_id = $v;
-            $this->modifiedColumns[FriendshipTableMap::COL_FRIENDSHIP_ID] = true;
+        if ($this->sale_rating_id !== $v) {
+            $this->sale_rating_id = $v;
+            $this->modifiedColumns[SaleRatingTableMap::COL_SALE_RATING_ID] = true;
         }
 
         return $this;
-    } // setFriendshipId()
+    } // setSaleRatingId()
 
     /**
-     * Sets the value of [invite_date] column to a normalized version of the date/time value specified.
+     * Set the value of [rating] column.
      *
-     * @param  mixed $v string, integer (timestamp), or \DateTime value.
-     *               Empty strings are treated as NULL.
-     * @return $this|\Friendship The current object (for fluent API support)
+     * @param  int $v new value
+     * @return $this|\SaleRating The current object (for fluent API support)
      */
-    public function setInviteDate($v)
+    public function setRating($v)
     {
-        $dt = PropelDateTime::newInstance($v, null, '\DateTime');
-        if ($this->invite_date !== null || $dt !== null) {
-            if ($dt !== $this->invite_date) {
-                $this->invite_date = $dt;
-                $this->modifiedColumns[FriendshipTableMap::COL_INVITE_DATE] = true;
-            }
-        } // if either are not null
+        if ($v !== null) {
+            $v = (int) $v;
+        }
+
+        if ($this->rating !== $v) {
+            $this->rating = $v;
+            $this->modifiedColumns[SaleRatingTableMap::COL_RATING] = true;
+        }
 
         return $this;
-    } // setInviteDate()
+    } // setRating()
 
     /**
-     * Set the value of [friend1] column.
+     * Set the value of [message] column.
      *
      * @param  string $v new value
-     * @return $this|\Friendship The current object (for fluent API support)
+     * @return $this|\SaleRating The current object (for fluent API support)
      */
-    public function setFriend1($v)
+    public function setMessage($v)
     {
         if ($v !== null) {
             $v = (string) $v;
         }
 
-        if ($this->friend1 !== $v) {
-            $this->friend1 = $v;
-            $this->modifiedColumns[FriendshipTableMap::COL_FRIEND1] = true;
-        }
-
-        if ($this->aUserRelatedByFriend1 !== null && $this->aUserRelatedByFriend1->getUserId() !== $v) {
-            $this->aUserRelatedByFriend1 = null;
+        if ($this->message !== $v) {
+            $this->message = $v;
+            $this->modifiedColumns[SaleRatingTableMap::COL_MESSAGE] = true;
         }
 
         return $this;
-    } // setFriend1()
+    } // setMessage()
 
     /**
-     * Set the value of [friend2] column.
+     * Set the value of [sale_id] column.
      *
      * @param  string $v new value
-     * @return $this|\Friendship The current object (for fluent API support)
+     * @return $this|\SaleRating The current object (for fluent API support)
      */
-    public function setFriend2($v)
+    public function setSaleId($v)
     {
         if ($v !== null) {
             $v = (string) $v;
         }
 
-        if ($this->friend2 !== $v) {
-            $this->friend2 = $v;
-            $this->modifiedColumns[FriendshipTableMap::COL_FRIEND2] = true;
+        if ($this->sale_id !== $v) {
+            $this->sale_id = $v;
+            $this->modifiedColumns[SaleRatingTableMap::COL_SALE_ID] = true;
         }
 
-        if ($this->aUserRelatedByFriend2 !== null && $this->aUserRelatedByFriend2->getUserId() !== $v) {
-            $this->aUserRelatedByFriend2 = null;
+        if ($this->aSale !== null && $this->aSale->getSaleId() !== $v) {
+            $this->aSale = null;
         }
 
         return $this;
-    } // setFriend2()
+    } // setSaleId()
+
+    /**
+     * Set the value of [rating_user_id] column.
+     *
+     * @param  string $v new value
+     * @return $this|\SaleRating The current object (for fluent API support)
+     */
+    public function setRatingUserId($v)
+    {
+        if ($v !== null) {
+            $v = (string) $v;
+        }
+
+        if ($this->rating_user_id !== $v) {
+            $this->rating_user_id = $v;
+            $this->modifiedColumns[SaleRatingTableMap::COL_RATING_USER_ID] = true;
+        }
+
+        if ($this->aUserRelatedByRatingUserId !== null && $this->aUserRelatedByRatingUserId->getUserId() !== $v) {
+            $this->aUserRelatedByRatingUserId = null;
+        }
+
+        return $this;
+    } // setRatingUserId()
+
+    /**
+     * Set the value of [posting_user_id] column.
+     *
+     * @param  string $v new value
+     * @return $this|\SaleRating The current object (for fluent API support)
+     */
+    public function setPostingUserId($v)
+    {
+        if ($v !== null) {
+            $v = (string) $v;
+        }
+
+        if ($this->posting_user_id !== $v) {
+            $this->posting_user_id = $v;
+            $this->modifiedColumns[SaleRatingTableMap::COL_POSTING_USER_ID] = true;
+        }
+
+        if ($this->aUserRelatedByPostingUserId !== null && $this->aUserRelatedByPostingUserId->getUserId() !== $v) {
+            $this->aUserRelatedByPostingUserId = null;
+        }
+
+        return $this;
+    } // setPostingUserId()
 
     /**
      * Reloads this object from datastore based on primary key and (optionally) resets all associated objects.
@@ -562,13 +639,13 @@ abstract class Friendship implements ActiveRecordInterface
         }
 
         if ($con === null) {
-            $con = Propel::getServiceContainer()->getReadConnection(FriendshipTableMap::DATABASE_NAME);
+            $con = Propel::getServiceContainer()->getReadConnection(SaleRatingTableMap::DATABASE_NAME);
         }
 
         // We don't need to alter the object instance pool; we're just modifying this instance
         // already in the pool.
 
-        $dataFetcher = ChildFriendshipQuery::create(null, $this->buildPkeyCriteria())->setFormatter(ModelCriteria::FORMAT_STATEMENT)->find($con);
+        $dataFetcher = ChildSaleRatingQuery::create(null, $this->buildPkeyCriteria())->setFormatter(ModelCriteria::FORMAT_STATEMENT)->find($con);
         $row = $dataFetcher->fetch();
         $dataFetcher->close();
         if (!$row) {
@@ -578,8 +655,9 @@ abstract class Friendship implements ActiveRecordInterface
 
         if ($deep) {  // also de-associate any related objects?
 
-            $this->aUserRelatedByFriend2 = null;
-            $this->aUserRelatedByFriend1 = null;
+            $this->aUserRelatedByPostingUserId = null;
+            $this->aSale = null;
+            $this->aUserRelatedByRatingUserId = null;
         } // if (deep)
     }
 
@@ -589,8 +667,8 @@ abstract class Friendship implements ActiveRecordInterface
      * @param      ConnectionInterface $con
      * @return void
      * @throws PropelException
-     * @see Friendship::setDeleted()
-     * @see Friendship::isDeleted()
+     * @see SaleRating::setDeleted()
+     * @see SaleRating::isDeleted()
      */
     public function delete(ConnectionInterface $con = null)
     {
@@ -599,11 +677,11 @@ abstract class Friendship implements ActiveRecordInterface
         }
 
         if ($con === null) {
-            $con = Propel::getServiceContainer()->getWriteConnection(FriendshipTableMap::DATABASE_NAME);
+            $con = Propel::getServiceContainer()->getWriteConnection(SaleRatingTableMap::DATABASE_NAME);
         }
 
         $con->transaction(function () use ($con) {
-            $deleteQuery = ChildFriendshipQuery::create()
+            $deleteQuery = ChildSaleRatingQuery::create()
                 ->filterByPrimaryKey($this->getPrimaryKey());
             $ret = $this->preDelete($con);
             if ($ret) {
@@ -634,7 +712,7 @@ abstract class Friendship implements ActiveRecordInterface
         }
 
         if ($con === null) {
-            $con = Propel::getServiceContainer()->getWriteConnection(FriendshipTableMap::DATABASE_NAME);
+            $con = Propel::getServiceContainer()->getWriteConnection(SaleRatingTableMap::DATABASE_NAME);
         }
 
         return $con->transaction(function () use ($con) {
@@ -653,7 +731,7 @@ abstract class Friendship implements ActiveRecordInterface
                     $this->postUpdate($con);
                 }
                 $this->postSave($con);
-                FriendshipTableMap::addInstanceToPool($this);
+                SaleRatingTableMap::addInstanceToPool($this);
             } else {
                 $affectedRows = 0;
             }
@@ -684,18 +762,25 @@ abstract class Friendship implements ActiveRecordInterface
             // method.  This object relates to these object(s) by a
             // foreign key reference.
 
-            if ($this->aUserRelatedByFriend2 !== null) {
-                if ($this->aUserRelatedByFriend2->isModified() || $this->aUserRelatedByFriend2->isNew()) {
-                    $affectedRows += $this->aUserRelatedByFriend2->save($con);
+            if ($this->aUserRelatedByPostingUserId !== null) {
+                if ($this->aUserRelatedByPostingUserId->isModified() || $this->aUserRelatedByPostingUserId->isNew()) {
+                    $affectedRows += $this->aUserRelatedByPostingUserId->save($con);
                 }
-                $this->setUserRelatedByFriend2($this->aUserRelatedByFriend2);
+                $this->setUserRelatedByPostingUserId($this->aUserRelatedByPostingUserId);
             }
 
-            if ($this->aUserRelatedByFriend1 !== null) {
-                if ($this->aUserRelatedByFriend1->isModified() || $this->aUserRelatedByFriend1->isNew()) {
-                    $affectedRows += $this->aUserRelatedByFriend1->save($con);
+            if ($this->aSale !== null) {
+                if ($this->aSale->isModified() || $this->aSale->isNew()) {
+                    $affectedRows += $this->aSale->save($con);
                 }
-                $this->setUserRelatedByFriend1($this->aUserRelatedByFriend1);
+                $this->setSale($this->aSale);
+            }
+
+            if ($this->aUserRelatedByRatingUserId !== null) {
+                if ($this->aUserRelatedByRatingUserId->isModified() || $this->aUserRelatedByRatingUserId->isNew()) {
+                    $affectedRows += $this->aUserRelatedByRatingUserId->save($con);
+                }
+                $this->setUserRelatedByRatingUserId($this->aUserRelatedByRatingUserId);
             }
 
             if ($this->isNew() || $this->isModified()) {
@@ -729,27 +814,33 @@ abstract class Friendship implements ActiveRecordInterface
         $modifiedColumns = array();
         $index = 0;
 
-        $this->modifiedColumns[FriendshipTableMap::COL_FRIENDSHIP_ID] = true;
-        if (null !== $this->friendship_id) {
-            throw new PropelException('Cannot insert a value for auto-increment primary key (' . FriendshipTableMap::COL_FRIENDSHIP_ID . ')');
+        $this->modifiedColumns[SaleRatingTableMap::COL_SALE_RATING_ID] = true;
+        if (null !== $this->sale_rating_id) {
+            throw new PropelException('Cannot insert a value for auto-increment primary key (' . SaleRatingTableMap::COL_SALE_RATING_ID . ')');
         }
 
          // check the columns in natural order for more readable SQL queries
-        if ($this->isColumnModified(FriendshipTableMap::COL_FRIENDSHIP_ID)) {
-            $modifiedColumns[':p' . $index++]  = 'FRIENDSHIP_ID';
+        if ($this->isColumnModified(SaleRatingTableMap::COL_SALE_RATING_ID)) {
+            $modifiedColumns[':p' . $index++]  = 'SALE_RATING_ID';
         }
-        if ($this->isColumnModified(FriendshipTableMap::COL_INVITE_DATE)) {
-            $modifiedColumns[':p' . $index++]  = 'INVITE_DATE';
+        if ($this->isColumnModified(SaleRatingTableMap::COL_RATING)) {
+            $modifiedColumns[':p' . $index++]  = 'RATING';
         }
-        if ($this->isColumnModified(FriendshipTableMap::COL_FRIEND1)) {
-            $modifiedColumns[':p' . $index++]  = 'FRIEND1';
+        if ($this->isColumnModified(SaleRatingTableMap::COL_MESSAGE)) {
+            $modifiedColumns[':p' . $index++]  = 'MESSAGE';
         }
-        if ($this->isColumnModified(FriendshipTableMap::COL_FRIEND2)) {
-            $modifiedColumns[':p' . $index++]  = 'FRIEND2';
+        if ($this->isColumnModified(SaleRatingTableMap::COL_SALE_ID)) {
+            $modifiedColumns[':p' . $index++]  = 'SALE_ID';
+        }
+        if ($this->isColumnModified(SaleRatingTableMap::COL_RATING_USER_ID)) {
+            $modifiedColumns[':p' . $index++]  = 'RATING_USER_ID';
+        }
+        if ($this->isColumnModified(SaleRatingTableMap::COL_POSTING_USER_ID)) {
+            $modifiedColumns[':p' . $index++]  = 'POSTING_USER_ID';
         }
 
         $sql = sprintf(
-            'INSERT INTO friendship (%s) VALUES (%s)',
+            'INSERT INTO sale_rating (%s) VALUES (%s)',
             implode(', ', $modifiedColumns),
             implode(', ', array_keys($modifiedColumns))
         );
@@ -758,17 +849,23 @@ abstract class Friendship implements ActiveRecordInterface
             $stmt = $con->prepare($sql);
             foreach ($modifiedColumns as $identifier => $columnName) {
                 switch ($columnName) {
-                    case 'FRIENDSHIP_ID':
-                        $stmt->bindValue($identifier, $this->friendship_id, PDO::PARAM_INT);
+                    case 'SALE_RATING_ID':
+                        $stmt->bindValue($identifier, $this->sale_rating_id, PDO::PARAM_INT);
                         break;
-                    case 'INVITE_DATE':
-                        $stmt->bindValue($identifier, $this->invite_date ? $this->invite_date->format("Y-m-d H:i:s") : null, PDO::PARAM_STR);
+                    case 'RATING':
+                        $stmt->bindValue($identifier, $this->rating, PDO::PARAM_INT);
                         break;
-                    case 'FRIEND1':
-                        $stmt->bindValue($identifier, $this->friend1, PDO::PARAM_INT);
+                    case 'MESSAGE':
+                        $stmt->bindValue($identifier, $this->message, PDO::PARAM_STR);
                         break;
-                    case 'FRIEND2':
-                        $stmt->bindValue($identifier, $this->friend2, PDO::PARAM_INT);
+                    case 'SALE_ID':
+                        $stmt->bindValue($identifier, $this->sale_id, PDO::PARAM_INT);
+                        break;
+                    case 'RATING_USER_ID':
+                        $stmt->bindValue($identifier, $this->rating_user_id, PDO::PARAM_INT);
+                        break;
+                    case 'POSTING_USER_ID':
+                        $stmt->bindValue($identifier, $this->posting_user_id, PDO::PARAM_INT);
                         break;
                 }
             }
@@ -783,7 +880,7 @@ abstract class Friendship implements ActiveRecordInterface
         } catch (Exception $e) {
             throw new PropelException('Unable to get autoincrement id.', 0, $e);
         }
-        $this->setFriendshipId($pk);
+        $this->setSaleRatingId($pk);
 
         $this->setNew(false);
     }
@@ -816,7 +913,7 @@ abstract class Friendship implements ActiveRecordInterface
      */
     public function getByName($name, $type = TableMap::TYPE_PHPNAME)
     {
-        $pos = FriendshipTableMap::translateFieldName($name, $type, TableMap::TYPE_NUM);
+        $pos = SaleRatingTableMap::translateFieldName($name, $type, TableMap::TYPE_NUM);
         $field = $this->getByPosition($pos);
 
         return $field;
@@ -833,16 +930,22 @@ abstract class Friendship implements ActiveRecordInterface
     {
         switch ($pos) {
             case 0:
-                return $this->getFriendshipId();
+                return $this->getSaleRatingId();
                 break;
             case 1:
-                return $this->getInviteDate();
+                return $this->getRating();
                 break;
             case 2:
-                return $this->getFriend1();
+                return $this->getMessage();
                 break;
             case 3:
-                return $this->getFriend2();
+                return $this->getSaleId();
+                break;
+            case 4:
+                return $this->getRatingUserId();
+                break;
+            case 5:
+                return $this->getPostingUserId();
                 break;
             default:
                 return null;
@@ -867,16 +970,18 @@ abstract class Friendship implements ActiveRecordInterface
      */
     public function toArray($keyType = TableMap::TYPE_PHPNAME, $includeLazyLoadColumns = true, $alreadyDumpedObjects = array(), $includeForeignObjects = false)
     {
-        if (isset($alreadyDumpedObjects['Friendship'][$this->getPrimaryKey()])) {
+        if (isset($alreadyDumpedObjects['SaleRating'][$this->getPrimaryKey()])) {
             return '*RECURSION*';
         }
-        $alreadyDumpedObjects['Friendship'][$this->getPrimaryKey()] = true;
-        $keys = FriendshipTableMap::getFieldNames($keyType);
+        $alreadyDumpedObjects['SaleRating'][$this->getPrimaryKey()] = true;
+        $keys = SaleRatingTableMap::getFieldNames($keyType);
         $result = array(
-            $keys[0] => $this->getFriendshipId(),
-            $keys[1] => $this->getInviteDate(),
-            $keys[2] => $this->getFriend1(),
-            $keys[3] => $this->getFriend2(),
+            $keys[0] => $this->getSaleRatingId(),
+            $keys[1] => $this->getRating(),
+            $keys[2] => $this->getMessage(),
+            $keys[3] => $this->getSaleId(),
+            $keys[4] => $this->getRatingUserId(),
+            $keys[5] => $this->getPostingUserId(),
         );
         $virtualColumns = $this->virtualColumns;
         foreach ($virtualColumns as $key => $virtualColumn) {
@@ -884,11 +989,14 @@ abstract class Friendship implements ActiveRecordInterface
         }
 
         if ($includeForeignObjects) {
-            if (null !== $this->aUserRelatedByFriend2) {
-                $result['UserRelatedByFriend2'] = $this->aUserRelatedByFriend2->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
+            if (null !== $this->aUserRelatedByPostingUserId) {
+                $result['UserRelatedByPostingUserId'] = $this->aUserRelatedByPostingUserId->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
             }
-            if (null !== $this->aUserRelatedByFriend1) {
-                $result['UserRelatedByFriend1'] = $this->aUserRelatedByFriend1->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
+            if (null !== $this->aSale) {
+                $result['Sale'] = $this->aSale->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
+            }
+            if (null !== $this->aUserRelatedByRatingUserId) {
+                $result['UserRelatedByRatingUserId'] = $this->aUserRelatedByRatingUserId->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
             }
         }
 
@@ -904,11 +1012,11 @@ abstract class Friendship implements ActiveRecordInterface
      *                one of the class type constants TableMap::TYPE_PHPNAME, TableMap::TYPE_STUDLYPHPNAME
      *                TableMap::TYPE_COLNAME, TableMap::TYPE_FIELDNAME, TableMap::TYPE_NUM.
      *                Defaults to TableMap::TYPE_PHPNAME.
-     * @return $this|\Friendship
+     * @return $this|\SaleRating
      */
     public function setByName($name, $value, $type = TableMap::TYPE_PHPNAME)
     {
-        $pos = FriendshipTableMap::translateFieldName($name, $type, TableMap::TYPE_NUM);
+        $pos = SaleRatingTableMap::translateFieldName($name, $type, TableMap::TYPE_NUM);
 
         return $this->setByPosition($pos, $value);
     }
@@ -919,22 +1027,28 @@ abstract class Friendship implements ActiveRecordInterface
      *
      * @param  int $pos position in xml schema
      * @param  mixed $value field value
-     * @return $this|\Friendship
+     * @return $this|\SaleRating
      */
     public function setByPosition($pos, $value)
     {
         switch ($pos) {
             case 0:
-                $this->setFriendshipId($value);
+                $this->setSaleRatingId($value);
                 break;
             case 1:
-                $this->setInviteDate($value);
+                $this->setRating($value);
                 break;
             case 2:
-                $this->setFriend1($value);
+                $this->setMessage($value);
                 break;
             case 3:
-                $this->setFriend2($value);
+                $this->setSaleId($value);
+                break;
+            case 4:
+                $this->setRatingUserId($value);
+                break;
+            case 5:
+                $this->setPostingUserId($value);
                 break;
         } // switch()
 
@@ -960,19 +1074,25 @@ abstract class Friendship implements ActiveRecordInterface
      */
     public function fromArray($arr, $keyType = TableMap::TYPE_PHPNAME)
     {
-        $keys = FriendshipTableMap::getFieldNames($keyType);
+        $keys = SaleRatingTableMap::getFieldNames($keyType);
 
         if (array_key_exists($keys[0], $arr)) {
-            $this->setFriendshipId($arr[$keys[0]]);
+            $this->setSaleRatingId($arr[$keys[0]]);
         }
         if (array_key_exists($keys[1], $arr)) {
-            $this->setInviteDate($arr[$keys[1]]);
+            $this->setRating($arr[$keys[1]]);
         }
         if (array_key_exists($keys[2], $arr)) {
-            $this->setFriend1($arr[$keys[2]]);
+            $this->setMessage($arr[$keys[2]]);
         }
         if (array_key_exists($keys[3], $arr)) {
-            $this->setFriend2($arr[$keys[3]]);
+            $this->setSaleId($arr[$keys[3]]);
+        }
+        if (array_key_exists($keys[4], $arr)) {
+            $this->setRatingUserId($arr[$keys[4]]);
+        }
+        if (array_key_exists($keys[5], $arr)) {
+            $this->setPostingUserId($arr[$keys[5]]);
         }
     }
 
@@ -987,7 +1107,7 @@ abstract class Friendship implements ActiveRecordInterface
      *                       or a format name ('XML', 'YAML', 'JSON', 'CSV')
      * @param string $data The source data to import from
      *
-     * @return $this|\Friendship The current object, for fluid interface
+     * @return $this|\SaleRating The current object, for fluid interface
      */
     public function importFrom($parser, $data)
     {
@@ -1007,19 +1127,25 @@ abstract class Friendship implements ActiveRecordInterface
      */
     public function buildCriteria()
     {
-        $criteria = new Criteria(FriendshipTableMap::DATABASE_NAME);
+        $criteria = new Criteria(SaleRatingTableMap::DATABASE_NAME);
 
-        if ($this->isColumnModified(FriendshipTableMap::COL_FRIENDSHIP_ID)) {
-            $criteria->add(FriendshipTableMap::COL_FRIENDSHIP_ID, $this->friendship_id);
+        if ($this->isColumnModified(SaleRatingTableMap::COL_SALE_RATING_ID)) {
+            $criteria->add(SaleRatingTableMap::COL_SALE_RATING_ID, $this->sale_rating_id);
         }
-        if ($this->isColumnModified(FriendshipTableMap::COL_INVITE_DATE)) {
-            $criteria->add(FriendshipTableMap::COL_INVITE_DATE, $this->invite_date);
+        if ($this->isColumnModified(SaleRatingTableMap::COL_RATING)) {
+            $criteria->add(SaleRatingTableMap::COL_RATING, $this->rating);
         }
-        if ($this->isColumnModified(FriendshipTableMap::COL_FRIEND1)) {
-            $criteria->add(FriendshipTableMap::COL_FRIEND1, $this->friend1);
+        if ($this->isColumnModified(SaleRatingTableMap::COL_MESSAGE)) {
+            $criteria->add(SaleRatingTableMap::COL_MESSAGE, $this->message);
         }
-        if ($this->isColumnModified(FriendshipTableMap::COL_FRIEND2)) {
-            $criteria->add(FriendshipTableMap::COL_FRIEND2, $this->friend2);
+        if ($this->isColumnModified(SaleRatingTableMap::COL_SALE_ID)) {
+            $criteria->add(SaleRatingTableMap::COL_SALE_ID, $this->sale_id);
+        }
+        if ($this->isColumnModified(SaleRatingTableMap::COL_RATING_USER_ID)) {
+            $criteria->add(SaleRatingTableMap::COL_RATING_USER_ID, $this->rating_user_id);
+        }
+        if ($this->isColumnModified(SaleRatingTableMap::COL_POSTING_USER_ID)) {
+            $criteria->add(SaleRatingTableMap::COL_POSTING_USER_ID, $this->posting_user_id);
         }
 
         return $criteria;
@@ -1037,8 +1163,8 @@ abstract class Friendship implements ActiveRecordInterface
      */
     public function buildPkeyCriteria()
     {
-        $criteria = new Criteria(FriendshipTableMap::DATABASE_NAME);
-        $criteria->add(FriendshipTableMap::COL_FRIENDSHIP_ID, $this->friendship_id);
+        $criteria = new Criteria(SaleRatingTableMap::DATABASE_NAME);
+        $criteria->add(SaleRatingTableMap::COL_SALE_RATING_ID, $this->sale_rating_id);
 
         return $criteria;
     }
@@ -1051,7 +1177,7 @@ abstract class Friendship implements ActiveRecordInterface
      */
     public function hashCode()
     {
-        $validPk = null !== $this->getFriendshipId();
+        $validPk = null !== $this->getSaleRatingId();
 
         $validPrimaryKeyFKs = 0;
         $primaryKeyFKs = [];
@@ -1071,18 +1197,18 @@ abstract class Friendship implements ActiveRecordInterface
      */
     public function getPrimaryKey()
     {
-        return $this->getFriendshipId();
+        return $this->getSaleRatingId();
     }
 
     /**
-     * Generic method to set the primary key (friendship_id column).
+     * Generic method to set the primary key (sale_rating_id column).
      *
      * @param       string $key Primary key.
      * @return void
      */
     public function setPrimaryKey($key)
     {
-        $this->setFriendshipId($key);
+        $this->setSaleRatingId($key);
     }
 
     /**
@@ -1091,7 +1217,7 @@ abstract class Friendship implements ActiveRecordInterface
      */
     public function isPrimaryKeyNull()
     {
-        return null === $this->getFriendshipId();
+        return null === $this->getSaleRatingId();
     }
 
     /**
@@ -1100,19 +1226,21 @@ abstract class Friendship implements ActiveRecordInterface
      * If desired, this method can also make copies of all associated (fkey referrers)
      * objects.
      *
-     * @param      object $copyObj An object of \Friendship (or compatible) type.
+     * @param      object $copyObj An object of \SaleRating (or compatible) type.
      * @param      boolean $deepCopy Whether to also copy all rows that refer (by fkey) to the current row.
      * @param      boolean $makeNew Whether to reset autoincrement PKs and make the object new.
      * @throws PropelException
      */
     public function copyInto($copyObj, $deepCopy = false, $makeNew = true)
     {
-        $copyObj->setInviteDate($this->getInviteDate());
-        $copyObj->setFriend1($this->getFriend1());
-        $copyObj->setFriend2($this->getFriend2());
+        $copyObj->setRating($this->getRating());
+        $copyObj->setMessage($this->getMessage());
+        $copyObj->setSaleId($this->getSaleId());
+        $copyObj->setRatingUserId($this->getRatingUserId());
+        $copyObj->setPostingUserId($this->getPostingUserId());
         if ($makeNew) {
             $copyObj->setNew(true);
-            $copyObj->setFriendshipId(NULL); // this is a auto-increment column, so set to default value
+            $copyObj->setSaleRatingId(NULL); // this is a auto-increment column, so set to default value
         }
     }
 
@@ -1125,7 +1253,7 @@ abstract class Friendship implements ActiveRecordInterface
      * objects.
      *
      * @param  boolean $deepCopy Whether to also copy all rows that refer (by fkey) to the current row.
-     * @return \Friendship Clone of current object.
+     * @return \SaleRating Clone of current object.
      * @throws PropelException
      */
     public function copy($deepCopy = false)
@@ -1142,23 +1270,23 @@ abstract class Friendship implements ActiveRecordInterface
      * Declares an association between this object and a ChildUser object.
      *
      * @param  ChildUser $v
-     * @return $this|\Friendship The current object (for fluent API support)
+     * @return $this|\SaleRating The current object (for fluent API support)
      * @throws PropelException
      */
-    public function setUserRelatedByFriend2(ChildUser $v = null)
+    public function setUserRelatedByPostingUserId(ChildUser $v = null)
     {
         if ($v === null) {
-            $this->setFriend2(NULL);
+            $this->setPostingUserId(NULL);
         } else {
-            $this->setFriend2($v->getUserId());
+            $this->setPostingUserId($v->getUserId());
         }
 
-        $this->aUserRelatedByFriend2 = $v;
+        $this->aUserRelatedByPostingUserId = $v;
 
         // Add binding for other direction of this n:n relationship.
         // If this object has already been added to the ChildUser object, it will not be re-added.
         if ($v !== null) {
-            $v->addFriendshipRelatedByFriend2($this);
+            $v->addSaleRatingRelatedByPostingUserId($this);
         }
 
 
@@ -1173,43 +1301,94 @@ abstract class Friendship implements ActiveRecordInterface
      * @return ChildUser The associated ChildUser object.
      * @throws PropelException
      */
-    public function getUserRelatedByFriend2(ConnectionInterface $con = null)
+    public function getUserRelatedByPostingUserId(ConnectionInterface $con = null)
     {
-        if ($this->aUserRelatedByFriend2 === null && (($this->friend2 !== "" && $this->friend2 !== null))) {
-            $this->aUserRelatedByFriend2 = ChildUserQuery::create()->findPk($this->friend2, $con);
+        if ($this->aUserRelatedByPostingUserId === null && (($this->posting_user_id !== "" && $this->posting_user_id !== null))) {
+            $this->aUserRelatedByPostingUserId = ChildUserQuery::create()->findPk($this->posting_user_id, $con);
             /* The following can be used additionally to
                 guarantee the related object contains a reference
                 to this object.  This level of coupling may, however, be
                 undesirable since it could result in an only partially populated collection
                 in the referenced object.
-                $this->aUserRelatedByFriend2->addFriendshipsRelatedByFriend2($this);
+                $this->aUserRelatedByPostingUserId->addSaleRatingsRelatedByPostingUserId($this);
              */
         }
 
-        return $this->aUserRelatedByFriend2;
+        return $this->aUserRelatedByPostingUserId;
+    }
+
+    /**
+     * Declares an association between this object and a ChildSale object.
+     *
+     * @param  ChildSale $v
+     * @return $this|\SaleRating The current object (for fluent API support)
+     * @throws PropelException
+     */
+    public function setSale(ChildSale $v = null)
+    {
+        if ($v === null) {
+            $this->setSaleId(NULL);
+        } else {
+            $this->setSaleId($v->getSaleId());
+        }
+
+        $this->aSale = $v;
+
+        // Add binding for other direction of this n:n relationship.
+        // If this object has already been added to the ChildSale object, it will not be re-added.
+        if ($v !== null) {
+            $v->addSaleRating($this);
+        }
+
+
+        return $this;
+    }
+
+
+    /**
+     * Get the associated ChildSale object
+     *
+     * @param  ConnectionInterface $con Optional Connection object.
+     * @return ChildSale The associated ChildSale object.
+     * @throws PropelException
+     */
+    public function getSale(ConnectionInterface $con = null)
+    {
+        if ($this->aSale === null && (($this->sale_id !== "" && $this->sale_id !== null))) {
+            $this->aSale = ChildSaleQuery::create()->findPk($this->sale_id, $con);
+            /* The following can be used additionally to
+                guarantee the related object contains a reference
+                to this object.  This level of coupling may, however, be
+                undesirable since it could result in an only partially populated collection
+                in the referenced object.
+                $this->aSale->addSaleRatings($this);
+             */
+        }
+
+        return $this->aSale;
     }
 
     /**
      * Declares an association between this object and a ChildUser object.
      *
      * @param  ChildUser $v
-     * @return $this|\Friendship The current object (for fluent API support)
+     * @return $this|\SaleRating The current object (for fluent API support)
      * @throws PropelException
      */
-    public function setUserRelatedByFriend1(ChildUser $v = null)
+    public function setUserRelatedByRatingUserId(ChildUser $v = null)
     {
         if ($v === null) {
-            $this->setFriend1(NULL);
+            $this->setRatingUserId(NULL);
         } else {
-            $this->setFriend1($v->getUserId());
+            $this->setRatingUserId($v->getUserId());
         }
 
-        $this->aUserRelatedByFriend1 = $v;
+        $this->aUserRelatedByRatingUserId = $v;
 
         // Add binding for other direction of this n:n relationship.
         // If this object has already been added to the ChildUser object, it will not be re-added.
         if ($v !== null) {
-            $v->addFriendshipRelatedByFriend1($this);
+            $v->addSaleRatingRelatedByRatingUserId($this);
         }
 
 
@@ -1224,20 +1403,20 @@ abstract class Friendship implements ActiveRecordInterface
      * @return ChildUser The associated ChildUser object.
      * @throws PropelException
      */
-    public function getUserRelatedByFriend1(ConnectionInterface $con = null)
+    public function getUserRelatedByRatingUserId(ConnectionInterface $con = null)
     {
-        if ($this->aUserRelatedByFriend1 === null && (($this->friend1 !== "" && $this->friend1 !== null))) {
-            $this->aUserRelatedByFriend1 = ChildUserQuery::create()->findPk($this->friend1, $con);
+        if ($this->aUserRelatedByRatingUserId === null && (($this->rating_user_id !== "" && $this->rating_user_id !== null))) {
+            $this->aUserRelatedByRatingUserId = ChildUserQuery::create()->findPk($this->rating_user_id, $con);
             /* The following can be used additionally to
                 guarantee the related object contains a reference
                 to this object.  This level of coupling may, however, be
                 undesirable since it could result in an only partially populated collection
                 in the referenced object.
-                $this->aUserRelatedByFriend1->addFriendshipsRelatedByFriend1($this);
+                $this->aUserRelatedByRatingUserId->addSaleRatingsRelatedByRatingUserId($this);
              */
         }
 
-        return $this->aUserRelatedByFriend1;
+        return $this->aUserRelatedByRatingUserId;
     }
 
     /**
@@ -1247,16 +1426,21 @@ abstract class Friendship implements ActiveRecordInterface
      */
     public function clear()
     {
-        if (null !== $this->aUserRelatedByFriend2) {
-            $this->aUserRelatedByFriend2->removeFriendshipRelatedByFriend2($this);
+        if (null !== $this->aUserRelatedByPostingUserId) {
+            $this->aUserRelatedByPostingUserId->removeSaleRatingRelatedByPostingUserId($this);
         }
-        if (null !== $this->aUserRelatedByFriend1) {
-            $this->aUserRelatedByFriend1->removeFriendshipRelatedByFriend1($this);
+        if (null !== $this->aSale) {
+            $this->aSale->removeSaleRating($this);
         }
-        $this->friendship_id = null;
-        $this->invite_date = null;
-        $this->friend1 = null;
-        $this->friend2 = null;
+        if (null !== $this->aUserRelatedByRatingUserId) {
+            $this->aUserRelatedByRatingUserId->removeSaleRatingRelatedByRatingUserId($this);
+        }
+        $this->sale_rating_id = null;
+        $this->rating = null;
+        $this->message = null;
+        $this->sale_id = null;
+        $this->rating_user_id = null;
+        $this->posting_user_id = null;
         $this->alreadyInSave = false;
         $this->clearAllReferences();
         $this->resetModified();
@@ -1277,8 +1461,9 @@ abstract class Friendship implements ActiveRecordInterface
         if ($deep) {
         } // if ($deep)
 
-        $this->aUserRelatedByFriend2 = null;
-        $this->aUserRelatedByFriend1 = null;
+        $this->aUserRelatedByPostingUserId = null;
+        $this->aSale = null;
+        $this->aUserRelatedByRatingUserId = null;
     }
 
     /**
@@ -1288,7 +1473,7 @@ abstract class Friendship implements ActiveRecordInterface
      */
     public function __toString()
     {
-        return (string) $this->exportTo(FriendshipTableMap::DEFAULT_STRING_FORMAT);
+        return (string) $this->exportTo(SaleRatingTableMap::DEFAULT_STRING_FORMAT);
     }
 
     /**

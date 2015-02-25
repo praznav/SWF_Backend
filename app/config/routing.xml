@@ -10,6 +10,12 @@
 				<route name=".Login" pattern="^/Login$" action="Login" output_type="xml" />
                 <route name=".Register" pattern="^/Register$" action="Register" output_type="xml" />
 			</route>
+            <route name="Friends" pattern="^/Friends" module="Friends">
+                <route name=".Add" pattern="^/Add$" action="Add" output_type="xml" />
+                <route name=".List" pattern="^/List$" action="List" output_type="xml" />
+                <route name=".Get" pattern="^/Get$" action="Get" output_type="xml" />
+                <route name=".Remove" pattern="^/Remove$" action="Remove" output_type="xml" />
+            </route>
         
         </routes>
 	</ae:configuration>
