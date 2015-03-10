@@ -56,9 +56,9 @@ use Propel\Runtime\Exception\PropelException;
  * @method     ChildUserQuery rightJoinFriendshipRelatedByFriend1($relationAlias = null) Adds a RIGHT JOIN clause to the query using the FriendshipRelatedByFriend1 relation
  * @method     ChildUserQuery innerJoinFriendshipRelatedByFriend1($relationAlias = null) Adds a INNER JOIN clause to the query using the FriendshipRelatedByFriend1 relation
  *
- * @method     ChildUserQuery leftJoinProductWishlistEntry($relationAlias = null) Adds a LEFT JOIN clause to the query using the ProductWishlistEntry relation
- * @method     ChildUserQuery rightJoinProductWishlistEntry($relationAlias = null) Adds a RIGHT JOIN clause to the query using the ProductWishlistEntry relation
- * @method     ChildUserQuery innerJoinProductWishlistEntry($relationAlias = null) Adds a INNER JOIN clause to the query using the ProductWishlistEntry relation
+ * @method     ChildUserQuery leftJoinInterest($relationAlias = null) Adds a LEFT JOIN clause to the query using the Interest relation
+ * @method     ChildUserQuery rightJoinInterest($relationAlias = null) Adds a RIGHT JOIN clause to the query using the Interest relation
+ * @method     ChildUserQuery innerJoinInterest($relationAlias = null) Adds a INNER JOIN clause to the query using the Interest relation
  *
  * @method     ChildUserQuery leftJoinSale($relationAlias = null) Adds a LEFT JOIN clause to the query using the Sale relation
  * @method     ChildUserQuery rightJoinSale($relationAlias = null) Adds a RIGHT JOIN clause to the query using the Sale relation
@@ -72,7 +72,7 @@ use Propel\Runtime\Exception\PropelException;
  * @method     ChildUserQuery rightJoinSaleRatingRelatedByRatingUserId($relationAlias = null) Adds a RIGHT JOIN clause to the query using the SaleRatingRelatedByRatingUserId relation
  * @method     ChildUserQuery innerJoinSaleRatingRelatedByRatingUserId($relationAlias = null) Adds a INNER JOIN clause to the query using the SaleRatingRelatedByRatingUserId relation
  *
- * @method     \PrivilegeTypeQuery|\FriendshipQuery|\ProductWishlistEntryQuery|\SaleQuery|\SaleRatingQuery endUse() Finalizes a secondary criteria and merges it with its primary Criteria
+ * @method     \PrivilegeTypeQuery|\FriendshipQuery|\InterestQuery|\SaleQuery|\SaleRatingQuery endUse() Finalizes a secondary criteria and merges it with its primary Criteria
  *
  * @method     ChildUser findOne(ConnectionInterface $con = null) Return the first ChildUser matching the query
  * @method     ChildUser findOneOrCreate(ConnectionInterface $con = null) Return the first ChildUser matching the query, or a new ChildUser object populated from the query conditions when no match is found
@@ -811,40 +811,40 @@ abstract class UserQuery extends ModelCriteria
     }
 
     /**
-     * Filter the query by a related \ProductWishlistEntry object
+     * Filter the query by a related \Interest object
      *
-     * @param \ProductWishlistEntry|ObjectCollection $productWishlistEntry  the related object to use as filter
+     * @param \Interest|ObjectCollection $interest  the related object to use as filter
      * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return ChildUserQuery The current query, for fluid interface
      */
-    public function filterByProductWishlistEntry($productWishlistEntry, $comparison = null)
+    public function filterByInterest($interest, $comparison = null)
     {
-        if ($productWishlistEntry instanceof \ProductWishlistEntry) {
+        if ($interest instanceof \Interest) {
             return $this
-                ->addUsingAlias(UserTableMap::COL_USER_ID, $productWishlistEntry->getUserId(), $comparison);
-        } elseif ($productWishlistEntry instanceof ObjectCollection) {
+                ->addUsingAlias(UserTableMap::COL_USER_ID, $interest->getUserId(), $comparison);
+        } elseif ($interest instanceof ObjectCollection) {
             return $this
-                ->useProductWishlistEntryQuery()
-                ->filterByPrimaryKeys($productWishlistEntry->getPrimaryKeys())
+                ->useInterestQuery()
+                ->filterByPrimaryKeys($interest->getPrimaryKeys())
                 ->endUse();
         } else {
-            throw new PropelException('filterByProductWishlistEntry() only accepts arguments of type \ProductWishlistEntry or Collection');
+            throw new PropelException('filterByInterest() only accepts arguments of type \Interest or Collection');
         }
     }
 
     /**
-     * Adds a JOIN clause to the query using the ProductWishlistEntry relation
+     * Adds a JOIN clause to the query using the Interest relation
      *
      * @param     string $relationAlias optional alias for the relation
      * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
      *
      * @return $this|ChildUserQuery The current query, for fluid interface
      */
-    public function joinProductWishlistEntry($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
+    public function joinInterest($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
     {
         $tableMap = $this->getTableMap();
-        $relationMap = $tableMap->getRelation('ProductWishlistEntry');
+        $relationMap = $tableMap->getRelation('Interest');
 
         // create a ModelJoin object for this join
         $join = new ModelJoin();
@@ -859,14 +859,14 @@ abstract class UserQuery extends ModelCriteria
             $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
             $this->addJoinObject($join, $relationAlias);
         } else {
-            $this->addJoinObject($join, 'ProductWishlistEntry');
+            $this->addJoinObject($join, 'Interest');
         }
 
         return $this;
     }
 
     /**
-     * Use the ProductWishlistEntry relation ProductWishlistEntry object
+     * Use the Interest relation Interest object
      *
      * @see useQuery()
      *
@@ -874,13 +874,13 @@ abstract class UserQuery extends ModelCriteria
      *                                   to be used as main alias in the secondary query
      * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
      *
-     * @return \ProductWishlistEntryQuery A secondary query class using the current class as primary query
+     * @return \InterestQuery A secondary query class using the current class as primary query
      */
-    public function useProductWishlistEntryQuery($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
+    public function useInterestQuery($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
     {
         return $this
-            ->joinProductWishlistEntry($relationAlias, $joinType)
-            ->useQuery($relationAlias ? $relationAlias : 'ProductWishlistEntry', '\ProductWishlistEntryQuery');
+            ->joinInterest($relationAlias, $joinType)
+            ->useQuery($relationAlias ? $relationAlias : 'Interest', '\InterestQuery');
     }
 
     /**

@@ -4,10 +4,10 @@ namespace Base;
 
 use \Friendship as ChildFriendship;
 use \FriendshipQuery as ChildFriendshipQuery;
+use \Interest as ChildInterest;
+use \InterestQuery as ChildInterestQuery;
 use \PrivilegeType as ChildPrivilegeType;
 use \PrivilegeTypeQuery as ChildPrivilegeTypeQuery;
-use \ProductWishlistEntry as ChildProductWishlistEntry;
-use \ProductWishlistEntryQuery as ChildProductWishlistEntryQuery;
 use \Sale as ChildSale;
 use \SaleQuery as ChildSaleQuery;
 use \SaleRating as ChildSaleRating;
@@ -138,10 +138,10 @@ abstract class User implements ActiveRecordInterface
     protected $collFriendshipsRelatedByFriend1Partial;
 
     /**
-     * @var        ObjectCollection|ChildProductWishlistEntry[] Collection to store aggregation of ChildProductWishlistEntry objects.
+     * @var        ObjectCollection|ChildInterest[] Collection to store aggregation of ChildInterest objects.
      */
-    protected $collProductWishlistEntries;
-    protected $collProductWishlistEntriesPartial;
+    protected $collInterests;
+    protected $collInterestsPartial;
 
     /**
      * @var        ObjectCollection|ChildSale[] Collection to store aggregation of ChildSale objects.
@@ -183,9 +183,9 @@ abstract class User implements ActiveRecordInterface
 
     /**
      * An array of objects scheduled for deletion.
-     * @var ObjectCollection|ChildProductWishlistEntry[]
+     * @var ObjectCollection|ChildInterest[]
      */
-    protected $productWishlistEntriesScheduledForDeletion = null;
+    protected $interestsScheduledForDeletion = null;
 
     /**
      * An array of objects scheduled for deletion.
@@ -848,7 +848,7 @@ abstract class User implements ActiveRecordInterface
 
             $this->collFriendshipsRelatedByFriend1 = null;
 
-            $this->collProductWishlistEntries = null;
+            $this->collInterests = null;
 
             $this->collSales = null;
 
@@ -1014,18 +1014,18 @@ abstract class User implements ActiveRecordInterface
                 }
             }
 
-            if ($this->productWishlistEntriesScheduledForDeletion !== null) {
-                if (!$this->productWishlistEntriesScheduledForDeletion->isEmpty()) {
-                    foreach ($this->productWishlistEntriesScheduledForDeletion as $productWishlistEntry) {
+            if ($this->interestsScheduledForDeletion !== null) {
+                if (!$this->interestsScheduledForDeletion->isEmpty()) {
+                    foreach ($this->interestsScheduledForDeletion as $interest) {
                         // need to save related object because we set the relation to null
-                        $productWishlistEntry->save($con);
+                        $interest->save($con);
                     }
-                    $this->productWishlistEntriesScheduledForDeletion = null;
+                    $this->interestsScheduledForDeletion = null;
                 }
             }
 
-            if ($this->collProductWishlistEntries !== null) {
-                foreach ($this->collProductWishlistEntries as $referrerFK) {
+            if ($this->collInterests !== null) {
+                foreach ($this->collInterests as $referrerFK) {
                     if (!$referrerFK->isDeleted() && ($referrerFK->isNew() || $referrerFK->isModified())) {
                         $affectedRows += $referrerFK->save($con);
                     }
@@ -1320,8 +1320,8 @@ abstract class User implements ActiveRecordInterface
             if (null !== $this->collFriendshipsRelatedByFriend1) {
                 $result['FriendshipsRelatedByFriend1'] = $this->collFriendshipsRelatedByFriend1->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
             }
-            if (null !== $this->collProductWishlistEntries) {
-                $result['ProductWishlistEntries'] = $this->collProductWishlistEntries->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
+            if (null !== $this->collInterests) {
+                $result['Interests'] = $this->collInterests->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
             }
             if (null !== $this->collSales) {
                 $result['Sales'] = $this->collSales->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
@@ -1620,9 +1620,9 @@ abstract class User implements ActiveRecordInterface
                 }
             }
 
-            foreach ($this->getProductWishlistEntries() as $relObj) {
+            foreach ($this->getInterests() as $relObj) {
                 if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
-                    $copyObj->addProductWishlistEntry($relObj->copy($deepCopy));
+                    $copyObj->addInterest($relObj->copy($deepCopy));
                 }
             }
 
@@ -1742,8 +1742,8 @@ abstract class User implements ActiveRecordInterface
         if ('FriendshipRelatedByFriend1' == $relationName) {
             return $this->initFriendshipsRelatedByFriend1();
         }
-        if ('ProductWishlistEntry' == $relationName) {
-            return $this->initProductWishlistEntries();
+        if ('Interest' == $relationName) {
+            return $this->initInterests();
         }
         if ('Sale' == $relationName) {
             return $this->initSales();
@@ -2193,31 +2193,31 @@ abstract class User implements ActiveRecordInterface
     }
 
     /**
-     * Clears out the collProductWishlistEntries collection
+     * Clears out the collInterests collection
      *
      * This does not modify the database; however, it will remove any associated objects, causing
      * them to be refetched by subsequent calls to accessor method.
      *
      * @return void
-     * @see        addProductWishlistEntries()
+     * @see        addInterests()
      */
-    public function clearProductWishlistEntries()
+    public function clearInterests()
     {
-        $this->collProductWishlistEntries = null; // important to set this to NULL since that means it is uninitialized
+        $this->collInterests = null; // important to set this to NULL since that means it is uninitialized
     }
 
     /**
-     * Reset is the collProductWishlistEntries collection loaded partially.
+     * Reset is the collInterests collection loaded partially.
      */
-    public function resetPartialProductWishlistEntries($v = true)
+    public function resetPartialInterests($v = true)
     {
-        $this->collProductWishlistEntriesPartial = $v;
+        $this->collInterestsPartial = $v;
     }
 
     /**
-     * Initializes the collProductWishlistEntries collection.
+     * Initializes the collInterests collection.
      *
-     * By default this just sets the collProductWishlistEntries collection to an empty array (like clearcollProductWishlistEntries());
+     * By default this just sets the collInterests collection to an empty array (like clearcollInterests());
      * however, you may wish to override this method in your stub class to provide setting appropriate
      * to your application -- for example, setting the initial array to the values stored in database.
      *
@@ -2226,17 +2226,17 @@ abstract class User implements ActiveRecordInterface
      *
      * @return void
      */
-    public function initProductWishlistEntries($overrideExisting = true)
+    public function initInterests($overrideExisting = true)
     {
-        if (null !== $this->collProductWishlistEntries && !$overrideExisting) {
+        if (null !== $this->collInterests && !$overrideExisting) {
             return;
         }
-        $this->collProductWishlistEntries = new ObjectCollection();
-        $this->collProductWishlistEntries->setModel('\ProductWishlistEntry');
+        $this->collInterests = new ObjectCollection();
+        $this->collInterests->setModel('\Interest');
     }
 
     /**
-     * Gets an array of ChildProductWishlistEntry objects which contain a foreign key that references this object.
+     * Gets an array of ChildInterest objects which contain a foreign key that references this object.
      *
      * If the $criteria is not null, it is used to always fetch the results from the database.
      * Otherwise the results are fetched from the database the first time, then cached.
@@ -2246,108 +2246,108 @@ abstract class User implements ActiveRecordInterface
      *
      * @param      Criteria $criteria optional Criteria object to narrow the query
      * @param      ConnectionInterface $con optional connection object
-     * @return ObjectCollection|ChildProductWishlistEntry[] List of ChildProductWishlistEntry objects
+     * @return ObjectCollection|ChildInterest[] List of ChildInterest objects
      * @throws PropelException
      */
-    public function getProductWishlistEntries(Criteria $criteria = null, ConnectionInterface $con = null)
+    public function getInterests(Criteria $criteria = null, ConnectionInterface $con = null)
     {
-        $partial = $this->collProductWishlistEntriesPartial && !$this->isNew();
-        if (null === $this->collProductWishlistEntries || null !== $criteria  || $partial) {
-            if ($this->isNew() && null === $this->collProductWishlistEntries) {
+        $partial = $this->collInterestsPartial && !$this->isNew();
+        if (null === $this->collInterests || null !== $criteria  || $partial) {
+            if ($this->isNew() && null === $this->collInterests) {
                 // return empty collection
-                $this->initProductWishlistEntries();
+                $this->initInterests();
             } else {
-                $collProductWishlistEntries = ChildProductWishlistEntryQuery::create(null, $criteria)
+                $collInterests = ChildInterestQuery::create(null, $criteria)
                     ->filterByUser($this)
                     ->find($con);
 
                 if (null !== $criteria) {
-                    if (false !== $this->collProductWishlistEntriesPartial && count($collProductWishlistEntries)) {
-                        $this->initProductWishlistEntries(false);
+                    if (false !== $this->collInterestsPartial && count($collInterests)) {
+                        $this->initInterests(false);
 
-                        foreach ($collProductWishlistEntries as $obj) {
-                            if (false == $this->collProductWishlistEntries->contains($obj)) {
-                                $this->collProductWishlistEntries->append($obj);
+                        foreach ($collInterests as $obj) {
+                            if (false == $this->collInterests->contains($obj)) {
+                                $this->collInterests->append($obj);
                             }
                         }
 
-                        $this->collProductWishlistEntriesPartial = true;
+                        $this->collInterestsPartial = true;
                     }
 
-                    return $collProductWishlistEntries;
+                    return $collInterests;
                 }
 
-                if ($partial && $this->collProductWishlistEntries) {
-                    foreach ($this->collProductWishlistEntries as $obj) {
+                if ($partial && $this->collInterests) {
+                    foreach ($this->collInterests as $obj) {
                         if ($obj->isNew()) {
-                            $collProductWishlistEntries[] = $obj;
+                            $collInterests[] = $obj;
                         }
                     }
                 }
 
-                $this->collProductWishlistEntries = $collProductWishlistEntries;
-                $this->collProductWishlistEntriesPartial = false;
+                $this->collInterests = $collInterests;
+                $this->collInterestsPartial = false;
             }
         }
 
-        return $this->collProductWishlistEntries;
+        return $this->collInterests;
     }
 
     /**
-     * Sets a collection of ChildProductWishlistEntry objects related by a one-to-many relationship
+     * Sets a collection of ChildInterest objects related by a one-to-many relationship
      * to the current object.
      * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
      * and new objects from the given Propel collection.
      *
-     * @param      Collection $productWishlistEntries A Propel collection.
+     * @param      Collection $interests A Propel collection.
      * @param      ConnectionInterface $con Optional connection object
      * @return $this|ChildUser The current object (for fluent API support)
      */
-    public function setProductWishlistEntries(Collection $productWishlistEntries, ConnectionInterface $con = null)
+    public function setInterests(Collection $interests, ConnectionInterface $con = null)
     {
-        /** @var ChildProductWishlistEntry[] $productWishlistEntriesToDelete */
-        $productWishlistEntriesToDelete = $this->getProductWishlistEntries(new Criteria(), $con)->diff($productWishlistEntries);
+        /** @var ChildInterest[] $interestsToDelete */
+        $interestsToDelete = $this->getInterests(new Criteria(), $con)->diff($interests);
 
 
-        $this->productWishlistEntriesScheduledForDeletion = $productWishlistEntriesToDelete;
+        $this->interestsScheduledForDeletion = $interestsToDelete;
 
-        foreach ($productWishlistEntriesToDelete as $productWishlistEntryRemoved) {
-            $productWishlistEntryRemoved->setUser(null);
+        foreach ($interestsToDelete as $interestRemoved) {
+            $interestRemoved->setUser(null);
         }
 
-        $this->collProductWishlistEntries = null;
-        foreach ($productWishlistEntries as $productWishlistEntry) {
-            $this->addProductWishlistEntry($productWishlistEntry);
+        $this->collInterests = null;
+        foreach ($interests as $interest) {
+            $this->addInterest($interest);
         }
 
-        $this->collProductWishlistEntries = $productWishlistEntries;
-        $this->collProductWishlistEntriesPartial = false;
+        $this->collInterests = $interests;
+        $this->collInterestsPartial = false;
 
         return $this;
     }
 
     /**
-     * Returns the number of related ProductWishlistEntry objects.
+     * Returns the number of related Interest objects.
      *
      * @param      Criteria $criteria
      * @param      boolean $distinct
      * @param      ConnectionInterface $con
-     * @return int             Count of related ProductWishlistEntry objects.
+     * @return int             Count of related Interest objects.
      * @throws PropelException
      */
-    public function countProductWishlistEntries(Criteria $criteria = null, $distinct = false, ConnectionInterface $con = null)
+    public function countInterests(Criteria $criteria = null, $distinct = false, ConnectionInterface $con = null)
     {
-        $partial = $this->collProductWishlistEntriesPartial && !$this->isNew();
-        if (null === $this->collProductWishlistEntries || null !== $criteria || $partial) {
-            if ($this->isNew() && null === $this->collProductWishlistEntries) {
+        $partial = $this->collInterestsPartial && !$this->isNew();
+        if (null === $this->collInterests || null !== $criteria || $partial) {
+            if ($this->isNew() && null === $this->collInterests) {
                 return 0;
             }
 
             if ($partial && !$criteria) {
-                return count($this->getProductWishlistEntries());
+                return count($this->getInterests());
             }
 
-            $query = ChildProductWishlistEntryQuery::create(null, $criteria);
+            $query = ChildInterestQuery::create(null, $criteria);
             if ($distinct) {
                 $query->distinct();
             }
@@ -2357,54 +2357,54 @@ abstract class User implements ActiveRecordInterface
                 ->count($con);
         }
 
-        return count($this->collProductWishlistEntries);
+        return count($this->collInterests);
     }
 
     /**
-     * Method called to associate a ChildProductWishlistEntry object to this object
-     * through the ChildProductWishlistEntry foreign key attribute.
+     * Method called to associate a ChildInterest object to this object
+     * through the ChildInterest foreign key attribute.
      *
-     * @param  ChildProductWishlistEntry $l ChildProductWishlistEntry
+     * @param  ChildInterest $l ChildInterest
      * @return $this|\User The current object (for fluent API support)
      */
-    public function addProductWishlistEntry(ChildProductWishlistEntry $l)
+    public function addInterest(ChildInterest $l)
     {
-        if ($this->collProductWishlistEntries === null) {
-            $this->initProductWishlistEntries();
-            $this->collProductWishlistEntriesPartial = true;
+        if ($this->collInterests === null) {
+            $this->initInterests();
+            $this->collInterestsPartial = true;
         }
 
-        if (!$this->collProductWishlistEntries->contains($l)) {
-            $this->doAddProductWishlistEntry($l);
+        if (!$this->collInterests->contains($l)) {
+            $this->doAddInterest($l);
         }
 
         return $this;
     }
 
     /**
-     * @param ChildProductWishlistEntry $productWishlistEntry The ChildProductWishlistEntry object to add.
+     * @param ChildInterest $interest The ChildInterest object to add.
      */
-    protected function doAddProductWishlistEntry(ChildProductWishlistEntry $productWishlistEntry)
+    protected function doAddInterest(ChildInterest $interest)
     {
-        $this->collProductWishlistEntries[]= $productWishlistEntry;
-        $productWishlistEntry->setUser($this);
+        $this->collInterests[]= $interest;
+        $interest->setUser($this);
     }
 
     /**
-     * @param  ChildProductWishlistEntry $productWishlistEntry The ChildProductWishlistEntry object to remove.
+     * @param  ChildInterest $interest The ChildInterest object to remove.
      * @return $this|ChildUser The current object (for fluent API support)
      */
-    public function removeProductWishlistEntry(ChildProductWishlistEntry $productWishlistEntry)
+    public function removeInterest(ChildInterest $interest)
     {
-        if ($this->getProductWishlistEntries()->contains($productWishlistEntry)) {
-            $pos = $this->collProductWishlistEntries->search($productWishlistEntry);
-            $this->collProductWishlistEntries->remove($pos);
-            if (null === $this->productWishlistEntriesScheduledForDeletion) {
-                $this->productWishlistEntriesScheduledForDeletion = clone $this->collProductWishlistEntries;
-                $this->productWishlistEntriesScheduledForDeletion->clear();
+        if ($this->getInterests()->contains($interest)) {
+            $pos = $this->collInterests->search($interest);
+            $this->collInterests->remove($pos);
+            if (null === $this->interestsScheduledForDeletion) {
+                $this->interestsScheduledForDeletion = clone $this->collInterests;
+                $this->interestsScheduledForDeletion->clear();
             }
-            $this->productWishlistEntriesScheduledForDeletion[]= $productWishlistEntry;
-            $productWishlistEntry->setUser(null);
+            $this->interestsScheduledForDeletion[]= $interest;
+            $interest->setUser(null);
         }
 
         return $this;
@@ -2416,7 +2416,7 @@ abstract class User implements ActiveRecordInterface
      * an identical criteria, it returns the collection.
      * Otherwise if this User is new, it will return
      * an empty collection; or if this User has previously
-     * been saved, it will retrieve related ProductWishlistEntries from storage.
+     * been saved, it will retrieve related Interests from storage.
      *
      * This method is protected by default in order to keep the public
      * api reasonable.  You can provide public methods for those you
@@ -2425,14 +2425,14 @@ abstract class User implements ActiveRecordInterface
      * @param      Criteria $criteria optional Criteria object to narrow the query
      * @param      ConnectionInterface $con optional connection object
      * @param      string $joinBehavior optional join type to use (defaults to Criteria::LEFT_JOIN)
-     * @return ObjectCollection|ChildProductWishlistEntry[] List of ChildProductWishlistEntry objects
+     * @return ObjectCollection|ChildInterest[] List of ChildInterest objects
      */
-    public function getProductWishlistEntriesJoinProduct(Criteria $criteria = null, ConnectionInterface $con = null, $joinBehavior = Criteria::LEFT_JOIN)
+    public function getInterestsJoinProduct(Criteria $criteria = null, ConnectionInterface $con = null, $joinBehavior = Criteria::LEFT_JOIN)
     {
-        $query = ChildProductWishlistEntryQuery::create(null, $criteria);
+        $query = ChildInterestQuery::create(null, $criteria);
         $query->joinWith('Product', $joinBehavior);
 
-        return $this->getProductWishlistEntries($query, $con);
+        return $this->getInterests($query, $con);
     }
 
     /**
@@ -3211,8 +3211,8 @@ abstract class User implements ActiveRecordInterface
                     $o->clearAllReferences($deep);
                 }
             }
-            if ($this->collProductWishlistEntries) {
-                foreach ($this->collProductWishlistEntries as $o) {
+            if ($this->collInterests) {
+                foreach ($this->collInterests as $o) {
                     $o->clearAllReferences($deep);
                 }
             }
@@ -3235,7 +3235,7 @@ abstract class User implements ActiveRecordInterface
 
         $this->collFriendshipsRelatedByFriend2 = null;
         $this->collFriendshipsRelatedByFriend1 = null;
-        $this->collProductWishlistEntries = null;
+        $this->collInterests = null;
         $this->collSales = null;
         $this->collSaleRatingsRelatedByPostingUserId = null;
         $this->collSaleRatingsRelatedByRatingUserId = null;

@@ -59,7 +59,7 @@ class ProductTableMap extends TableMap
     /**
      * The total number of columns
      */
-    const NUM_COLUMNS = 3;
+    const NUM_COLUMNS = 2;
 
     /**
      * The number of lazy-loaded columns
@@ -69,7 +69,7 @@ class ProductTableMap extends TableMap
     /**
      * The number of columns to hydrate (NUM_COLUMNS - NUM_LAZY_LOAD_COLUMNS)
      */
-    const NUM_HYDRATE_COLUMNS = 3;
+    const NUM_HYDRATE_COLUMNS = 2;
 
     /**
      * the column name for the PRODUCT_ID field
@@ -80,11 +80,6 @@ class ProductTableMap extends TableMap
      * the column name for the PRODUCT_NAME field
      */
     const COL_PRODUCT_NAME = 'product.PRODUCT_NAME';
-
-    /**
-     * the column name for the PRODUCT_PRICE field
-     */
-    const COL_PRODUCT_PRICE = 'product.PRODUCT_PRICE';
 
     /**
      * The default string format for model objects of the related table
@@ -98,12 +93,12 @@ class ProductTableMap extends TableMap
      * e.g. self::$fieldNames[self::TYPE_PHPNAME][0] = 'Id'
      */
     protected static $fieldNames = array (
-        self::TYPE_PHPNAME       => array('ProductId', 'ProductName', 'ProductPrice', ),
-        self::TYPE_STUDLYPHPNAME => array('productId', 'productName', 'productPrice', ),
-        self::TYPE_COLNAME       => array(ProductTableMap::COL_PRODUCT_ID, ProductTableMap::COL_PRODUCT_NAME, ProductTableMap::COL_PRODUCT_PRICE, ),
-        self::TYPE_RAW_COLNAME   => array('COL_PRODUCT_ID', 'COL_PRODUCT_NAME', 'COL_PRODUCT_PRICE', ),
-        self::TYPE_FIELDNAME     => array('product_id', 'product_name', 'product_price', ),
-        self::TYPE_NUM           => array(0, 1, 2, )
+        self::TYPE_PHPNAME       => array('ProductId', 'ProductName', ),
+        self::TYPE_STUDLYPHPNAME => array('productId', 'productName', ),
+        self::TYPE_COLNAME       => array(ProductTableMap::COL_PRODUCT_ID, ProductTableMap::COL_PRODUCT_NAME, ),
+        self::TYPE_RAW_COLNAME   => array('COL_PRODUCT_ID', 'COL_PRODUCT_NAME', ),
+        self::TYPE_FIELDNAME     => array('product_id', 'product_name', ),
+        self::TYPE_NUM           => array(0, 1, )
     );
 
     /**
@@ -113,12 +108,12 @@ class ProductTableMap extends TableMap
      * e.g. self::$fieldKeys[self::TYPE_PHPNAME]['Id'] = 0
      */
     protected static $fieldKeys = array (
-        self::TYPE_PHPNAME       => array('ProductId' => 0, 'ProductName' => 1, 'ProductPrice' => 2, ),
-        self::TYPE_STUDLYPHPNAME => array('productId' => 0, 'productName' => 1, 'productPrice' => 2, ),
-        self::TYPE_COLNAME       => array(ProductTableMap::COL_PRODUCT_ID => 0, ProductTableMap::COL_PRODUCT_NAME => 1, ProductTableMap::COL_PRODUCT_PRICE => 2, ),
-        self::TYPE_RAW_COLNAME   => array('COL_PRODUCT_ID' => 0, 'COL_PRODUCT_NAME' => 1, 'COL_PRODUCT_PRICE' => 2, ),
-        self::TYPE_FIELDNAME     => array('product_id' => 0, 'product_name' => 1, 'product_price' => 2, ),
-        self::TYPE_NUM           => array(0, 1, 2, )
+        self::TYPE_PHPNAME       => array('ProductId' => 0, 'ProductName' => 1, ),
+        self::TYPE_STUDLYPHPNAME => array('productId' => 0, 'productName' => 1, ),
+        self::TYPE_COLNAME       => array(ProductTableMap::COL_PRODUCT_ID => 0, ProductTableMap::COL_PRODUCT_NAME => 1, ),
+        self::TYPE_RAW_COLNAME   => array('COL_PRODUCT_ID' => 0, 'COL_PRODUCT_NAME' => 1, ),
+        self::TYPE_FIELDNAME     => array('product_id' => 0, 'product_name' => 1, ),
+        self::TYPE_NUM           => array(0, 1, )
     );
 
     /**
@@ -139,7 +134,6 @@ class ProductTableMap extends TableMap
         // columns
         $this->addPrimaryKey('PRODUCT_ID', 'ProductId', 'BIGINT', true, null, null);
         $this->addColumn('PRODUCT_NAME', 'ProductName', 'VARCHAR', true, 50, null);
-        $this->addColumn('PRODUCT_PRICE', 'ProductPrice', 'DECIMAL', true, null, null);
     } // initialize()
 
     /**
@@ -147,7 +141,7 @@ class ProductTableMap extends TableMap
      */
     public function buildRelations()
     {
-        $this->addRelation('ProductWishlistEntry', '\\ProductWishlistEntry', RelationMap::ONE_TO_MANY, array('product_id' => 'product_id', ), null, null, 'ProductWishlistEntries');
+        $this->addRelation('Interest', '\\Interest', RelationMap::ONE_TO_MANY, array('product_id' => 'product_id', ), null, null, 'Interests');
         $this->addRelation('Sale', '\\Sale', RelationMap::ONE_TO_MANY, array('product_id' => 'product_id', ), null, null, 'Sales');
     } // buildRelations()
 
@@ -294,11 +288,9 @@ class ProductTableMap extends TableMap
         if (null === $alias) {
             $criteria->addSelectColumn(ProductTableMap::COL_PRODUCT_ID);
             $criteria->addSelectColumn(ProductTableMap::COL_PRODUCT_NAME);
-            $criteria->addSelectColumn(ProductTableMap::COL_PRODUCT_PRICE);
         } else {
             $criteria->addSelectColumn($alias . '.PRODUCT_ID');
             $criteria->addSelectColumn($alias . '.PRODUCT_NAME');
-            $criteria->addSelectColumn($alias . '.PRODUCT_PRICE');
         }
     }
 

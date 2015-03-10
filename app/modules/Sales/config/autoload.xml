@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ae:configurations xmlns="http://agavi.org/agavi/config/parts/autoload/1.0" xmlns:ae="http://agavi.org/agavi/config/global/envelope/1.0">
+	
+	<ae:configuration>
+		
+		<autoload name="ShoppingwithfriendsSalesBaseAction">%core.module_dir%/Sales/lib/action/ShoppingwithfriendsSalesBaseAction.class.php</autoload>
+		<autoload name="ShoppingwithfriendsSalesBaseModel">%core.module_dir%/Sales/lib/model/ShoppingwithfriendsSalesBaseModel.class.php</autoload>
+		<autoload name="ShoppingwithfriendsSalesBaseView">%core.module_dir%/Sales/lib/view/ShoppingwithfriendsSalesBaseView.class.php</autoload>
+        <autoload name="Sales_UsernameValidator">%core.module_dir%/Sales/lib/validator/UsernameValidator.class.php</autoload>
+        <autoload name="Sales_PasswordValidator">%core.module_dir%/Sales/lib/validator/PasswordValidator.class.php</autoload>
+        <autoload name="Sales_ProductNameValidator">%core.module_dir%/Sales/lib/validator/ProductNameValidator.class.php</autoload>
+        <autoload name="Sales_ProductPriceValidator">%core.module_dir%/Sales/lib/validator/ProductPriceValidator.class.php</autoload>
+		
+	</ae:configuration>
+	
+</ae:configurations>

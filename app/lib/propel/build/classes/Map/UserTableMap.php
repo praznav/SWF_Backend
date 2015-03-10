@@ -186,7 +186,7 @@ class UserTableMap extends TableMap
         $this->addRelation('PrivilegeType', '\\PrivilegeType', RelationMap::MANY_TO_ONE, array('privelege_type_id' => 'privelege_type_id', ), null, null);
         $this->addRelation('FriendshipRelatedByFriend2', '\\Friendship', RelationMap::ONE_TO_MANY, array('user_id' => 'friend2', ), null, null, 'FriendshipsRelatedByFriend2');
         $this->addRelation('FriendshipRelatedByFriend1', '\\Friendship', RelationMap::ONE_TO_MANY, array('user_id' => 'friend1', ), null, null, 'FriendshipsRelatedByFriend1');
-        $this->addRelation('ProductWishlistEntry', '\\ProductWishlistEntry', RelationMap::ONE_TO_MANY, array('user_id' => 'user_id', ), null, null, 'ProductWishlistEntries');
+        $this->addRelation('Interest', '\\Interest', RelationMap::ONE_TO_MANY, array('user_id' => 'user_id', ), null, null, 'Interests');
         $this->addRelation('Sale', '\\Sale', RelationMap::ONE_TO_MANY, array('user_id' => 'user_id', ), null, null, 'Sales');
         $this->addRelation('SaleRatingRelatedByPostingUserId', '\\SaleRating', RelationMap::ONE_TO_MANY, array('user_id' => 'posting_user_id', ), null, null, 'SaleRatingsRelatedByPostingUserId');
         $this->addRelation('SaleRatingRelatedByRatingUserId', '\\SaleRating', RelationMap::ONE_TO_MANY, array('user_id' => 'rating_user_id', ), null, null, 'SaleRatingsRelatedByRatingUserId');

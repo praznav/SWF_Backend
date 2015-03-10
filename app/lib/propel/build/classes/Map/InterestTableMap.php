@@ -2,8 +2,8 @@
 
 namespace Map;
 
-use \ProductWishlistEntry;
-use \ProductWishlistEntryQuery;
+use \Interest;
+use \InterestQuery;
 use Propel\Runtime\Propel;
 use Propel\Runtime\ActiveQuery\Criteria;
 use Propel\Runtime\ActiveQuery\InstancePoolTrait;
@@ -16,7 +16,7 @@ use Propel\Runtime\Map\TableMapTrait;
 
 
 /**
- * This class defines the structure of the 'product_wishlist_entry' table.
+ * This class defines the structure of the 'interest' table.
  *
  *
  *
@@ -26,7 +26,7 @@ use Propel\Runtime\Map\TableMapTrait;
  * (i.e. if it's a text column type).
  *
  */
-class ProductWishlistEntryTableMap extends TableMap
+class InterestTableMap extends TableMap
 {
     use InstancePoolTrait;
     use TableMapTrait;
@@ -34,7 +34,7 @@ class ProductWishlistEntryTableMap extends TableMap
     /**
      * The (dot-path) name of this class
      */
-    const CLASS_NAME = '.Map.ProductWishlistEntryTableMap';
+    const CLASS_NAME = '.Map.InterestTableMap';
 
     /**
      * The default database name for this class
@@ -44,22 +44,22 @@ class ProductWishlistEntryTableMap extends TableMap
     /**
      * The table name for this class
      */
-    const TABLE_NAME = 'product_wishlist_entry';
+    const TABLE_NAME = 'interest';
 
     /**
      * The related Propel class for this table
      */
-    const OM_CLASS = '\\ProductWishlistEntry';
+    const OM_CLASS = '\\Interest';
 
     /**
      * A class that can be returned by this tableMap
      */
-    const CLASS_DEFAULT = 'ProductWishlistEntry';
+    const CLASS_DEFAULT = 'Interest';
 
     /**
      * The total number of columns
      */
-    const NUM_COLUMNS = 3;
+    const NUM_COLUMNS = 4;
 
     /**
      * The number of lazy-loaded columns
@@ -69,22 +69,27 @@ class ProductWishlistEntryTableMap extends TableMap
     /**
      * The number of columns to hydrate (NUM_COLUMNS - NUM_LAZY_LOAD_COLUMNS)
      */
-    const NUM_HYDRATE_COLUMNS = 3;
+    const NUM_HYDRATE_COLUMNS = 4;
 
     /**
-     * the column name for the PRODUCT_WISHLIST_ENTRY_ID field
+     * the column name for the INTEREST_ID field
      */
-    const COL_PRODUCT_WISHLIST_ENTRY_ID = 'product_wishlist_entry.PRODUCT_WISHLIST_ENTRY_ID';
+    const COL_INTEREST_ID = 'interest.INTEREST_ID';
+
+    /**
+     * the column name for the MAX_PRICE field
+     */
+    const COL_MAX_PRICE = 'interest.MAX_PRICE';
 
     /**
      * the column name for the USER_ID field
      */
-    const COL_USER_ID = 'product_wishlist_entry.USER_ID';
+    const COL_USER_ID = 'interest.USER_ID';
 
     /**
      * the column name for the PRODUCT_ID field
      */
-    const COL_PRODUCT_ID = 'product_wishlist_entry.PRODUCT_ID';
+    const COL_PRODUCT_ID = 'interest.PRODUCT_ID';
 
     /**
      * The default string format for model objects of the related table
@@ -98,12 +103,12 @@ class ProductWishlistEntryTableMap extends TableMap
      * e.g. self::$fieldNames[self::TYPE_PHPNAME][0] = 'Id'
      */
     protected static $fieldNames = array (
-        self::TYPE_PHPNAME       => array('ProductWishlistEntryId', 'UserId', 'ProductId', ),
-        self::TYPE_STUDLYPHPNAME => array('productWishlistEntryId', 'userId', 'productId', ),
-        self::TYPE_COLNAME       => array(ProductWishlistEntryTableMap::COL_PRODUCT_WISHLIST_ENTRY_ID, ProductWishlistEntryTableMap::COL_USER_ID, ProductWishlistEntryTableMap::COL_PRODUCT_ID, ),
-        self::TYPE_RAW_COLNAME   => array('COL_PRODUCT_WISHLIST_ENTRY_ID', 'COL_USER_ID', 'COL_PRODUCT_ID', ),
-        self::TYPE_FIELDNAME     => array('product_wishlist_entry_id', 'user_id', 'product_id', ),
-        self::TYPE_NUM           => array(0, 1, 2, )
+        self::TYPE_PHPNAME       => array('InterestId', 'MaxPrice', 'UserId', 'ProductId', ),
+        self::TYPE_STUDLYPHPNAME => array('interestId', 'maxPrice', 'userId', 'productId', ),
+        self::TYPE_COLNAME       => array(InterestTableMap::COL_INTEREST_ID, InterestTableMap::COL_MAX_PRICE, InterestTableMap::COL_USER_ID, InterestTableMap::COL_PRODUCT_ID, ),
+        self::TYPE_RAW_COLNAME   => array('COL_INTEREST_ID', 'COL_MAX_PRICE', 'COL_USER_ID', 'COL_PRODUCT_ID', ),
+        self::TYPE_FIELDNAME     => array('interest_id', 'max_price', 'user_id', 'product_id', ),
+        self::TYPE_NUM           => array(0, 1, 2, 3, )
     );
 
     /**
@@ -113,12 +118,12 @@ class ProductWishlistEntryTableMap extends TableMap
      * e.g. self::$fieldKeys[self::TYPE_PHPNAME]['Id'] = 0
      */
     protected static $fieldKeys = array (
-        self::TYPE_PHPNAME       => array('ProductWishlistEntryId' => 0, 'UserId' => 1, 'ProductId' => 2, ),
-        self::TYPE_STUDLYPHPNAME => array('productWishlistEntryId' => 0, 'userId' => 1, 'productId' => 2, ),
-        self::TYPE_COLNAME       => array(ProductWishlistEntryTableMap::COL_PRODUCT_WISHLIST_ENTRY_ID => 0, ProductWishlistEntryTableMap::COL_USER_ID => 1, ProductWishlistEntryTableMap::COL_PRODUCT_ID => 2, ),
-        self::TYPE_RAW_COLNAME   => array('COL_PRODUCT_WISHLIST_ENTRY_ID' => 0, 'COL_USER_ID' => 1, 'COL_PRODUCT_ID' => 2, ),
-        self::TYPE_FIELDNAME     => array('product_wishlist_entry_id' => 0, 'user_id' => 1, 'product_id' => 2, ),
-        self::TYPE_NUM           => array(0, 1, 2, )
+        self::TYPE_PHPNAME       => array('InterestId' => 0, 'MaxPrice' => 1, 'UserId' => 2, 'ProductId' => 3, ),
+        self::TYPE_STUDLYPHPNAME => array('interestId' => 0, 'maxPrice' => 1, 'userId' => 2, 'productId' => 3, ),
+        self::TYPE_COLNAME       => array(InterestTableMap::COL_INTEREST_ID => 0, InterestTableMap::COL_MAX_PRICE => 1, InterestTableMap::COL_USER_ID => 2, InterestTableMap::COL_PRODUCT_ID => 3, ),
+        self::TYPE_RAW_COLNAME   => array('COL_INTEREST_ID' => 0, 'COL_MAX_PRICE' => 1, 'COL_USER_ID' => 2, 'COL_PRODUCT_ID' => 3, ),
+        self::TYPE_FIELDNAME     => array('interest_id' => 0, 'max_price' => 1, 'user_id' => 2, 'product_id' => 3, ),
+        self::TYPE_NUM           => array(0, 1, 2, 3, )
     );
 
     /**
@@ -131,13 +136,14 @@ class ProductWishlistEntryTableMap extends TableMap
     public function initialize()
     {
         // attributes
-        $this->setName('product_wishlist_entry');
-        $this->setPhpName('ProductWishlistEntry');
-        $this->setClassName('\\ProductWishlistEntry');
+        $this->setName('interest');
+        $this->setPhpName('Interest');
+        $this->setClassName('\\Interest');
         $this->setPackage('');
         $this->setUseIdGenerator(true);
         // columns
-        $this->addPrimaryKey('PRODUCT_WISHLIST_ENTRY_ID', 'ProductWishlistEntryId', 'BIGINT', true, null, null);
+        $this->addPrimaryKey('INTEREST_ID', 'InterestId', 'BIGINT', true, null, null);
+        $this->addColumn('MAX_PRICE', 'MaxPrice', 'DECIMAL', true, 12, null);
         $this->addForeignKey('USER_ID', 'UserId', 'BIGINT', 'user', 'USER_ID', false, null, null);
         $this->addForeignKey('PRODUCT_ID', 'ProductId', 'BIGINT', 'product', 'PRODUCT_ID', false, null, null);
     } // initialize()
@@ -167,11 +173,11 @@ class ProductWishlistEntryTableMap extends TableMap
     public static function getPrimaryKeyHashFromRow($row, $offset = 0, $indexType = TableMap::TYPE_NUM)
     {
         // If the PK cannot be derived from the row, return NULL.
-        if ($row[TableMap::TYPE_NUM == $indexType ? 0 + $offset : static::translateFieldName('ProductWishlistEntryId', TableMap::TYPE_PHPNAME, $indexType)] === null) {
+        if ($row[TableMap::TYPE_NUM == $indexType ? 0 + $offset : static::translateFieldName('InterestId', TableMap::TYPE_PHPNAME, $indexType)] === null) {
             return null;
         }
 
-        return (string) $row[TableMap::TYPE_NUM == $indexType ? 0 + $offset : static::translateFieldName('ProductWishlistEntryId', TableMap::TYPE_PHPNAME, $indexType)];
+        return (string) $row[TableMap::TYPE_NUM == $indexType ? 0 + $offset : static::translateFieldName('InterestId', TableMap::TYPE_PHPNAME, $indexType)];
     }
 
     /**
@@ -191,7 +197,7 @@ class ProductWishlistEntryTableMap extends TableMap
         return (string) $row[
             $indexType == TableMap::TYPE_NUM
                 ? 0 + $offset
-                : self::translateFieldName('ProductWishlistEntryId', TableMap::TYPE_PHPNAME, $indexType)
+                : self::translateFieldName('InterestId', TableMap::TYPE_PHPNAME, $indexType)
         ];
     }
 
@@ -208,7 +214,7 @@ class ProductWishlistEntryTableMap extends TableMap
      */
     public static function getOMClass($withPrefix = true)
     {
-        return $withPrefix ? ProductWishlistEntryTableMap::CLASS_DEFAULT : ProductWishlistEntryTableMap::OM_CLASS;
+        return $withPrefix ? InterestTableMap::CLASS_DEFAULT : InterestTableMap::OM_CLASS;
     }
 
     /**
@@ -222,22 +228,22 @@ class ProductWishlistEntryTableMap extends TableMap
      *
      * @throws PropelException Any exceptions caught during processing will be
      *                         rethrown wrapped into a PropelException.
-     * @return array           (ProductWishlistEntry object, last column rank)
+     * @return array           (Interest object, last column rank)
      */
     public static function populateObject($row, $offset = 0, $indexType = TableMap::TYPE_NUM)
     {
-        $key = ProductWishlistEntryTableMap::getPrimaryKeyHashFromRow($row, $offset, $indexType);
-        if (null !== ($obj = ProductWishlistEntryTableMap::getInstanceFromPool($key))) {
+        $key = InterestTableMap::getPrimaryKeyHashFromRow($row, $offset, $indexType);
+        if (null !== ($obj = InterestTableMap::getInstanceFromPool($key))) {
             // We no longer rehydrate the object, since this can cause data loss.
             // See http://www.propelorm.org/ticket/509
             // $obj->hydrate($row, $offset, true); // rehydrate
-            $col = $offset + ProductWishlistEntryTableMap::NUM_HYDRATE_COLUMNS;
+            $col = $offset + InterestTableMap::NUM_HYDRATE_COLUMNS;
         } else {
-            $cls = ProductWishlistEntryTableMap::OM_CLASS;
-            /** @var ProductWishlistEntry $obj */
+            $cls = InterestTableMap::OM_CLASS;
+            /** @var Interest $obj */
             $obj = new $cls();
             $col = $obj->hydrate($row, $offset, false, $indexType);
-            ProductWishlistEntryTableMap::addInstanceToPool($obj, $key);
+            InterestTableMap::addInstanceToPool($obj, $key);
         }
 
         return array($obj, $col);
@@ -260,18 +266,18 @@ class ProductWishlistEntryTableMap extends TableMap
         $cls = static::getOMClass(false);
         // populate the object(s)
         while ($row = $dataFetcher->fetch()) {
-            $key = ProductWishlistEntryTableMap::getPrimaryKeyHashFromRow($row, 0, $dataFetcher->getIndexType());
-            if (null !== ($obj = ProductWishlistEntryTableMap::getInstanceFromPool($key))) {
+            $key = InterestTableMap::getPrimaryKeyHashFromRow($row, 0, $dataFetcher->getIndexType());
+            if (null !== ($obj = InterestTableMap::getInstanceFromPool($key))) {
                 // We no longer rehydrate the object, since this can cause data loss.
                 // See http://www.propelorm.org/ticket/509
                 // $obj->hydrate($row, 0, true); // rehydrate
                 $results[] = $obj;
             } else {
-                /** @var ProductWishlistEntry $obj */
+                /** @var Interest $obj */
                 $obj = new $cls();
                 $obj->hydrate($row);
                 $results[] = $obj;
-                ProductWishlistEntryTableMap::addInstanceToPool($obj, $key);
+                InterestTableMap::addInstanceToPool($obj, $key);
             } // if key exists
         }
 
@@ -292,11 +298,13 @@ class ProductWishlistEntryTableMap extends TableMap
     public static function addSelectColumns(Criteria $criteria, $alias = null)
     {
         if (null === $alias) {
-            $criteria->addSelectColumn(ProductWishlistEntryTableMap::COL_PRODUCT_WISHLIST_ENTRY_ID);
-            $criteria->addSelectColumn(ProductWishlistEntryTableMap::COL_USER_ID);
-            $criteria->addSelectColumn(ProductWishlistEntryTableMap::COL_PRODUCT_ID);
+            $criteria->addSelectColumn(InterestTableMap::COL_INTEREST_ID);
+            $criteria->addSelectColumn(InterestTableMap::COL_MAX_PRICE);
+            $criteria->addSelectColumn(InterestTableMap::COL_USER_ID);
+            $criteria->addSelectColumn(InterestTableMap::COL_PRODUCT_ID);
         } else {
-            $criteria->addSelectColumn($alias . '.PRODUCT_WISHLIST_ENTRY_ID');
+            $criteria->addSelectColumn($alias . '.INTEREST_ID');
+            $criteria->addSelectColumn($alias . '.MAX_PRICE');
             $criteria->addSelectColumn($alias . '.USER_ID');
             $criteria->addSelectColumn($alias . '.PRODUCT_ID');
         }
@@ -311,7 +319,7 @@ class ProductWishlistEntryTableMap extends TableMap
      */
     public static function getTableMap()
     {
-        return Propel::getServiceContainer()->getDatabaseMap(ProductWishlistEntryTableMap::DATABASE_NAME)->getTable(ProductWishlistEntryTableMap::TABLE_NAME);
+        return Propel::getServiceContainer()->getDatabaseMap(InterestTableMap::DATABASE_NAME)->getTable(InterestTableMap::TABLE_NAME);
     }
 
     /**
@@ -319,16 +327,16 @@ class ProductWishlistEntryTableMap extends TableMap
      */
     public static function buildTableMap()
     {
-        $dbMap = Propel::getServiceContainer()->getDatabaseMap(ProductWishlistEntryTableMap::DATABASE_NAME);
-        if (!$dbMap->hasTable(ProductWishlistEntryTableMap::TABLE_NAME)) {
-            $dbMap->addTableObject(new ProductWishlistEntryTableMap());
+        $dbMap = Propel::getServiceContainer()->getDatabaseMap(InterestTableMap::DATABASE_NAME);
+        if (!$dbMap->hasTable(InterestTableMap::TABLE_NAME)) {
+            $dbMap->addTableObject(new InterestTableMap());
         }
     }
 
     /**
-     * Performs a DELETE on the database, given a ProductWishlistEntry or Criteria object OR a primary key value.
+     * Performs a DELETE on the database, given a Interest or Criteria object OR a primary key value.
      *
-     * @param mixed               $values Criteria or ProductWishlistEntry object or primary key or array of primary keys
+     * @param mixed               $values Criteria or Interest object or primary key or array of primary keys
      *              which is used to create the DELETE statement
      * @param  ConnectionInterface $con the connection to use
      * @return int             The number of affected rows (if supported by underlying database driver).  This includes CASCADE-related rows
@@ -339,27 +347,27 @@ class ProductWishlistEntryTableMap extends TableMap
      public static function doDelete($values, ConnectionInterface $con = null)
      {
         if (null === $con) {
-            $con = Propel::getServiceContainer()->getWriteConnection(ProductWishlistEntryTableMap::DATABASE_NAME);
+            $con = Propel::getServiceContainer()->getWriteConnection(InterestTableMap::DATABASE_NAME);
         }
 
         if ($values instanceof Criteria) {
             // rename for clarity
             $criteria = $values;
-        } elseif ($values instanceof \ProductWishlistEntry) { // it's a model object
+        } elseif ($values instanceof \Interest) { // it's a model object
             // create criteria based on pk values
             $criteria = $values->buildPkeyCriteria();
         } else { // it's a primary key, or an array of pks
-            $criteria = new Criteria(ProductWishlistEntryTableMap::DATABASE_NAME);
-            $criteria->add(ProductWishlistEntryTableMap::COL_PRODUCT_WISHLIST_ENTRY_ID, (array) $values, Criteria::IN);
+            $criteria = new Criteria(InterestTableMap::DATABASE_NAME);
+            $criteria->add(InterestTableMap::COL_INTEREST_ID, (array) $values, Criteria::IN);
         }
 
-        $query = ProductWishlistEntryQuery::create()->mergeWith($criteria);
+        $query = InterestQuery::create()->mergeWith($criteria);
 
         if ($values instanceof Criteria) {
-            ProductWishlistEntryTableMap::clearInstancePool();
+            InterestTableMap::clearInstancePool();
         } elseif (!is_object($values)) { // it's a primary key, or an array of pks
             foreach ((array) $values as $singleval) {
-                ProductWishlistEntryTableMap::removeInstanceFromPool($singleval);
+                InterestTableMap::removeInstanceFromPool($singleval);
             }
         }
 
@@ -367,20 +375,20 @@ class ProductWishlistEntryTableMap extends TableMap
     }
 
     /**
-     * Deletes all rows from the product_wishlist_entry table.
+     * Deletes all rows from the interest table.
      *
      * @param ConnectionInterface $con the connection to use
      * @return int The number of affected rows (if supported by underlying database driver).
      */
     public static function doDeleteAll(ConnectionInterface $con = null)
     {
-        return ProductWishlistEntryQuery::create()->doDeleteAll($con);
+        return InterestQuery::create()->doDeleteAll($con);
     }
 
     /**
-     * Performs an INSERT on the database, given a ProductWishlistEntry or Criteria object.
+     * Performs an INSERT on the database, given a Interest or Criteria object.
      *
-     * @param mixed               $criteria Criteria or ProductWishlistEntry object containing data that is used to create the INSERT statement.
+     * @param mixed               $criteria Criteria or Interest object containing data that is used to create the INSERT statement.
      * @param ConnectionInterface $con the ConnectionInterface connection to use
      * @return mixed           The new primary key.
      * @throws PropelException Any exceptions caught during processing will be
@@ -389,22 +397,22 @@ class ProductWishlistEntryTableMap extends TableMap
     public static function doInsert($criteria, ConnectionInterface $con = null)
     {
         if (null === $con) {
-            $con = Propel::getServiceContainer()->getWriteConnection(ProductWishlistEntryTableMap::DATABASE_NAME);
+            $con = Propel::getServiceContainer()->getWriteConnection(InterestTableMap::DATABASE_NAME);
         }
 
         if ($criteria instanceof Criteria) {
             $criteria = clone $criteria; // rename for clarity
         } else {
-            $criteria = $criteria->buildCriteria(); // build Criteria from ProductWishlistEntry object
+            $criteria = $criteria->buildCriteria(); // build Criteria from Interest object
         }
 
-        if ($criteria->containsKey(ProductWishlistEntryTableMap::COL_PRODUCT_WISHLIST_ENTRY_ID) && $criteria->keyContainsValue(ProductWishlistEntryTableMap::COL_PRODUCT_WISHLIST_ENTRY_ID) ) {
-            throw new PropelException('Cannot insert a value for auto-increment primary key ('.ProductWishlistEntryTableMap::COL_PRODUCT_WISHLIST_ENTRY_ID.')');
+        if ($criteria->containsKey(InterestTableMap::COL_INTEREST_ID) && $criteria->keyContainsValue(InterestTableMap::COL_INTEREST_ID) ) {
+            throw new PropelException('Cannot insert a value for auto-increment primary key ('.InterestTableMap::COL_INTEREST_ID.')');
         }
 
 
         // Set the correct dbName
-        $query = ProductWishlistEntryQuery::create()->mergeWith($criteria);
+        $query = InterestQuery::create()->mergeWith($criteria);
 
         // use transaction because $criteria could contain info
         // for more than one table (I guess, conceivably)
@@ -413,7 +421,7 @@ class ProductWishlistEntryTableMap extends TableMap
         });
     }
 
-} // ProductWishlistEntryTableMap
+} // InterestTableMap
 // This is the static code needed to register the TableMap for this table with the main Propel class.
 //
-ProductWishlistEntryTableMap::buildTableMap();
+InterestTableMap::buildTableMap();

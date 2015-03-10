@@ -21,11 +21,13 @@ use Propel\Runtime\Exception\PropelException;
  *
  *
  * @method     ChildSaleQuery orderBySaleId($order = Criteria::ASC) Order by the sale_id column
+ * @method     ChildSaleQuery orderByPrice($order = Criteria::ASC) Order by the price column
  * @method     ChildSaleQuery orderByLocation($order = Criteria::ASC) Order by the location column
  * @method     ChildSaleQuery orderByUserId($order = Criteria::ASC) Order by the user_id column
  * @method     ChildSaleQuery orderByProductId($order = Criteria::ASC) Order by the product_id column
  *
  * @method     ChildSaleQuery groupBySaleId() Group by the sale_id column
+ * @method     ChildSaleQuery groupByPrice() Group by the price column
  * @method     ChildSaleQuery groupByLocation() Group by the location column
  * @method     ChildSaleQuery groupByUserId() Group by the user_id column
  * @method     ChildSaleQuery groupByProductId() Group by the product_id column
@@ -52,12 +54,14 @@ use Propel\Runtime\Exception\PropelException;
  * @method     ChildSale findOneOrCreate(ConnectionInterface $con = null) Return the first ChildSale matching the query, or a new ChildSale object populated from the query conditions when no match is found
  *
  * @method     ChildSale findOneBySaleId(string $sale_id) Return the first ChildSale filtered by the sale_id column
+ * @method     ChildSale findOneByPrice(string $price) Return the first ChildSale filtered by the price column
  * @method     ChildSale findOneByLocation(string $location) Return the first ChildSale filtered by the location column
  * @method     ChildSale findOneByUserId(string $user_id) Return the first ChildSale filtered by the user_id column
  * @method     ChildSale findOneByProductId(string $product_id) Return the first ChildSale filtered by the product_id column
  *
  * @method     ChildSale[]|ObjectCollection find(ConnectionInterface $con = null) Return ChildSale objects based on current ModelCriteria
  * @method     ChildSale[]|ObjectCollection findBySaleId(string $sale_id) Return ChildSale objects filtered by the sale_id column
+ * @method     ChildSale[]|ObjectCollection findByPrice(string $price) Return ChildSale objects filtered by the price column
  * @method     ChildSale[]|ObjectCollection findByLocation(string $location) Return ChildSale objects filtered by the location column
  * @method     ChildSale[]|ObjectCollection findByUserId(string $user_id) Return ChildSale objects filtered by the user_id column
  * @method     ChildSale[]|ObjectCollection findByProductId(string $product_id) Return ChildSale objects filtered by the product_id column
@@ -150,7 +154,7 @@ abstract class SaleQuery extends ModelCriteria
      */
     protected function findPkSimple($key, ConnectionInterface $con)
     {
-        $sql = 'SELECT SALE_ID, LOCATION, USER_ID, PRODUCT_ID FROM sale WHERE SALE_ID = :p0';
+        $sql = 'SELECT SALE_ID, PRICE, LOCATION, USER_ID, PRODUCT_ID FROM sale WHERE SALE_ID = :p0';
         try {
             $stmt = $con->prepare($sql);
             $stmt->bindValue(':p0', $key, PDO::PARAM_INT);
@@ -279,6 +283,47 @@ abstract class SaleQuery extends ModelCriteria
         }
 
         return $this->addUsingAlias(SaleTableMap::COL_SALE_ID, $saleId, $comparison);
+    }
+
+    /**
+     * Filter the query on the price column
+     *
+     * Example usage:
+     * <code>
+     * $query->filterByPrice(1234); // WHERE price = 1234
+     * $query->filterByPrice(array(12, 34)); // WHERE price IN (12, 34)
+     * $query->filterByPrice(array('min' => 12)); // WHERE price > 12
+     * </code>
+     *
+     * @param     mixed $price The value to use as filter.
+     *              Use scalar values for equality.
+     *              Use array values for in_array() equivalent.
+     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return $this|ChildSaleQuery The current query, for fluid interface
+     */
+    public function filterByPrice($price = null, $comparison = null)
+    {
+        if (is_array($price)) {
+            $useMinMax = false;
+            if (isset($price['min'])) {
+                $this->addUsingAlias(SaleTableMap::COL_PRICE, $price['min'], Criteria::GREATER_EQUAL);
+                $useMinMax = true;
+            }
+            if (isset($price['max'])) {
+                $this->addUsingAlias(SaleTableMap::COL_PRICE, $price['max'], Criteria::LESS_EQUAL);
+                $useMinMax = true;
+            }
+            if ($useMinMax) {
+                return $this;
+            }
+            if (null === $comparison) {
+                $comparison = Criteria::IN;
+            }
+        }
+
+        return $this->addUsingAlias(SaleTableMap::COL_PRICE, $price, $comparison);
     }
 
     /**

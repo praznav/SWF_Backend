@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ae:configurations
+	xmlns="http://agavi.org/agavi/config/parts/validators/1.0"
+	xmlns:ae="http://agavi.org/agavi/config/global/envelope/1.0"
+	parent="%core.module_dir%/Sales/config/validators.xml"
+>
+	
+	<ae:configuration>
+		
+		<validators>
+            <validator class="Sales_UsernameValidator" name="username">
+                <arguments>
+                    <argument>username</argument>
+                </arguments>
+                <errors>
+                    <error>You must enter a username.</error>
+                    <error for="not_set">You must enter a username.</error>
+                    <error for="too_short">Your username must be at least 4 characters long.</error>
+                    <error for="too_long">Your username cannot be longer than 25 characters.</error>
+                    <error for="invalid_character">Your username contains invalid characters. The only allowed characters are A-Z, a-z, periods and dashes.</error>
+                </errors>
+            </validator>
+            <validator class="Sales_PasswordValidator" name="password">
+                <arguments>
+                    <argument>password</argument>
+                </arguments>
+                <errors>
+                    <error>You must enter a password.</error>
+                    <error for="not_set">You must enter a password.</error>
+                    <error for="too_short">Your password must be at least 5 characters long.</error>
+                    <error for="too_long">Your password cannot be longer than 50 characters.</error>
+                </errors>
+            </validator>
+            <validator class="Sales_ProductNameValidator" name="productName">
+                <arguments>
+                    <argument>productName</argument>
+                </arguments>
+                <errors>
+                    <error>You must enter a product name.</error>
+                    <error for="not_set">You must enter a product name.</error>
+                    <error for="too_short">Your product name must be at least 1 character long.</error>
+                    <error for="too_long">Your product name cannot be longer than 50 characters.</error>
+                    <error for="invalid_character">Your product name contains invalid characters. The only allowed characters are A-Z, a-z, 0-9, preiods and dashes.</error>
+                </errors>
+            </validator>
+            <validator class="Sales_ProductPriceValidator" name="maxPrice">
+                <arguments>
+                    <argument>maxPrice</argument>
+                </arguments>
+                <errors>
+                    <error>You must enter a maximum price for your interest.</error>
+                    <error for="not_set">You must enter a maximum price for your interest.</error>
+                    <error for="too_low">You cannot enter a negative price for your interest.</error>
+                    <error for="too_high">You cannot enter a price greater than 9999999999.99.</error>
+                </errors>
+            </validator>
+
+		</validators>
+		
+	</ae:configuration>
+	
+</ae:configurations>

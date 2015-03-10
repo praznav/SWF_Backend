@@ -2,10 +2,10 @@
 
 namespace Base;
 
+use \Interest as ChildInterest;
+use \InterestQuery as ChildInterestQuery;
 use \Product as ChildProduct;
 use \ProductQuery as ChildProductQuery;
-use \ProductWishlistEntry as ChildProductWishlistEntry;
-use \ProductWishlistEntryQuery as ChildProductWishlistEntryQuery;
 use \Sale as ChildSale;
 use \SaleQuery as ChildSaleQuery;
 use \Exception;
@@ -71,16 +71,10 @@ abstract class Product implements ActiveRecordInterface
     protected $product_name;
 
     /**
-     * The value for the product_price field.
-     * @var        string
+     * @var        ObjectCollection|ChildInterest[] Collection to store aggregation of ChildInterest objects.
      */
-    protected $product_price;
-
-    /**
-     * @var        ObjectCollection|ChildProductWishlistEntry[] Collection to store aggregation of ChildProductWishlistEntry objects.
-     */
-    protected $collProductWishlistEntries;
-    protected $collProductWishlistEntriesPartial;
+    protected $collInterests;
+    protected $collInterestsPartial;
 
     /**
      * @var        ObjectCollection|ChildSale[] Collection to store aggregation of ChildSale objects.
@@ -98,9 +92,9 @@ abstract class Product implements ActiveRecordInterface
 
     /**
      * An array of objects scheduled for deletion.
-     * @var ObjectCollection|ChildProductWishlistEntry[]
+     * @var ObjectCollection|ChildInterest[]
      */
-    protected $productWishlistEntriesScheduledForDeletion = null;
+    protected $interestsScheduledForDeletion = null;
 
     /**
      * An array of objects scheduled for deletion.
@@ -346,16 +340,6 @@ abstract class Product implements ActiveRecordInterface
     }
 
     /**
-     * Get the [product_price] column value.
-     *
-     * @return string
-     */
-    public function getProductPrice()
-    {
-        return $this->product_price;
-    }
-
-    /**
      * Indicates whether the columns in this object are only set to default values.
      *
      * This method can be used in conjunction with isModified() to indicate whether an object is both
@@ -396,9 +380,6 @@ abstract class Product implements ActiveRecordInterface
 
             $col = $row[TableMap::TYPE_NUM == $indexType ? 1 + $startcol : ProductTableMap::translateFieldName('ProductName', TableMap::TYPE_PHPNAME, $indexType)];
             $this->product_name = (null !== $col) ? (string) $col : null;
-
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 2 + $startcol : ProductTableMap::translateFieldName('ProductPrice', TableMap::TYPE_PHPNAME, $indexType)];
-            $this->product_price = (null !== $col) ? (string) $col : null;
             $this->resetModified();
 
             $this->setNew(false);
@@ -407,7 +388,7 @@ abstract class Product implements ActiveRecordInterface
                 $this->ensureConsistency();
             }
 
-            return $startcol + 3; // 3 = ProductTableMap::NUM_HYDRATE_COLUMNS.
+            return $startcol + 2; // 2 = ProductTableMap::NUM_HYDRATE_COLUMNS.
 
         } catch (Exception $e) {
             throw new PropelException(sprintf('Error populating %s object', '\\Product'), 0, $e);
@@ -472,26 +453,6 @@ abstract class Product implements ActiveRecordInterface
     } // setProductName()
 
     /**
-     * Set the value of [product_price] column.
-     *
-     * @param  string $v new value
-     * @return $this|\Product The current object (for fluent API support)
-     */
-    public function setProductPrice($v)
-    {
-        if ($v !== null) {
-            $v = (string) $v;
-        }
-
-        if ($this->product_price !== $v) {
-            $this->product_price = $v;
-            $this->modifiedColumns[ProductTableMap::COL_PRODUCT_PRICE] = true;
-        }
-
-        return $this;
-    } // setProductPrice()
-
-    /**
      * Reloads this object from datastore based on primary key and (optionally) resets all associated objects.
      *
      * This will only work if the object has been saved and has a valid primary key set.
@@ -528,7 +489,7 @@ abstract class Product implements ActiveRecordInterface
 
         if ($deep) {  // also de-associate any related objects?
 
-            $this->collProductWishlistEntries = null;
+            $this->collInterests = null;
 
             $this->collSales = null;
 
@@ -642,18 +603,18 @@ abstract class Product implements ActiveRecordInterface
                 $this->resetModified();
             }
 
-            if ($this->productWishlistEntriesScheduledForDeletion !== null) {
-                if (!$this->productWishlistEntriesScheduledForDeletion->isEmpty()) {
-                    foreach ($this->productWishlistEntriesScheduledForDeletion as $productWishlistEntry) {
+            if ($this->interestsScheduledForDeletion !== null) {
+                if (!$this->interestsScheduledForDeletion->isEmpty()) {
+                    foreach ($this->interestsScheduledForDeletion as $interest) {
                         // need to save related object because we set the relation to null
-                        $productWishlistEntry->save($con);
+                        $interest->save($con);
                     }
-                    $this->productWishlistEntriesScheduledForDeletion = null;
+                    $this->interestsScheduledForDeletion = null;
                 }
             }
 
-            if ($this->collProductWishlistEntries !== null) {
-                foreach ($this->collProductWishlistEntries as $referrerFK) {
+            if ($this->collInterests !== null) {
+                foreach ($this->collInterests as $referrerFK) {
                     if (!$referrerFK->isDeleted() && ($referrerFK->isNew() || $referrerFK->isModified())) {
                         $affectedRows += $referrerFK->save($con);
                     }
@@ -710,9 +671,6 @@ abstract class Product implements ActiveRecordInterface
         if ($this->isColumnModified(ProductTableMap::COL_PRODUCT_NAME)) {
             $modifiedColumns[':p' . $index++]  = 'PRODUCT_NAME';
         }
-        if ($this->isColumnModified(ProductTableMap::COL_PRODUCT_PRICE)) {
-            $modifiedColumns[':p' . $index++]  = 'PRODUCT_PRICE';
-        }
 
         $sql = sprintf(
             'INSERT INTO product (%s) VALUES (%s)',
@@ -729,9 +687,6 @@ abstract class Product implements ActiveRecordInterface
                         break;
                     case 'PRODUCT_NAME':
                         $stmt->bindValue($identifier, $this->product_name, PDO::PARAM_STR);
-                        break;
-                    case 'PRODUCT_PRICE':
-                        $stmt->bindValue($identifier, $this->product_price, PDO::PARAM_STR);
                         break;
                 }
             }
@@ -801,9 +756,6 @@ abstract class Product implements ActiveRecordInterface
             case 1:
                 return $this->getProductName();
                 break;
-            case 2:
-                return $this->getProductPrice();
-                break;
             default:
                 return null;
                 break;
@@ -835,7 +787,6 @@ abstract class Product implements ActiveRecordInterface
         $result = array(
             $keys[0] => $this->getProductId(),
             $keys[1] => $this->getProductName(),
-            $keys[2] => $this->getProductPrice(),
         );
         $virtualColumns = $this->virtualColumns;
         foreach ($virtualColumns as $key => $virtualColumn) {
@@ -843,8 +794,8 @@ abstract class Product implements ActiveRecordInterface
         }
 
         if ($includeForeignObjects) {
-            if (null !== $this->collProductWishlistEntries) {
-                $result['ProductWishlistEntries'] = $this->collProductWishlistEntries->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
+            if (null !== $this->collInterests) {
+                $result['Interests'] = $this->collInterests->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
             }
             if (null !== $this->collSales) {
                 $result['Sales'] = $this->collSales->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
@@ -889,9 +840,6 @@ abstract class Product implements ActiveRecordInterface
             case 1:
                 $this->setProductName($value);
                 break;
-            case 2:
-                $this->setProductPrice($value);
-                break;
         } // switch()
 
         return $this;
@@ -923,9 +871,6 @@ abstract class Product implements ActiveRecordInterface
         }
         if (array_key_exists($keys[1], $arr)) {
             $this->setProductName($arr[$keys[1]]);
-        }
-        if (array_key_exists($keys[2], $arr)) {
-            $this->setProductPrice($arr[$keys[2]]);
         }
     }
 
@@ -967,9 +912,6 @@ abstract class Product implements ActiveRecordInterface
         }
         if ($this->isColumnModified(ProductTableMap::COL_PRODUCT_NAME)) {
             $criteria->add(ProductTableMap::COL_PRODUCT_NAME, $this->product_name);
-        }
-        if ($this->isColumnModified(ProductTableMap::COL_PRODUCT_PRICE)) {
-            $criteria->add(ProductTableMap::COL_PRODUCT_PRICE, $this->product_price);
         }
 
         return $criteria;
@@ -1058,16 +1000,15 @@ abstract class Product implements ActiveRecordInterface
     public function copyInto($copyObj, $deepCopy = false, $makeNew = true)
     {
         $copyObj->setProductName($this->getProductName());
-        $copyObj->setProductPrice($this->getProductPrice());
 
         if ($deepCopy) {
             // important: temporarily setNew(false) because this affects the behavior of
             // the getter/setter methods for fkey referrer objects.
             $copyObj->setNew(false);
 
-            foreach ($this->getProductWishlistEntries() as $relObj) {
+            foreach ($this->getInterests() as $relObj) {
                 if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
-                    $copyObj->addProductWishlistEntry($relObj->copy($deepCopy));
+                    $copyObj->addInterest($relObj->copy($deepCopy));
                 }
             }
 
@@ -1118,8 +1059,8 @@ abstract class Product implements ActiveRecordInterface
      */
     public function initRelation($relationName)
     {
-        if ('ProductWishlistEntry' == $relationName) {
-            return $this->initProductWishlistEntries();
+        if ('Interest' == $relationName) {
+            return $this->initInterests();
         }
         if ('Sale' == $relationName) {
             return $this->initSales();
@@ -1127,31 +1068,31 @@ abstract class Product implements ActiveRecordInterface
     }
 
     /**
-     * Clears out the collProductWishlistEntries collection
+     * Clears out the collInterests collection
      *
      * This does not modify the database; however, it will remove any associated objects, causing
      * them to be refetched by subsequent calls to accessor method.
      *
      * @return void
-     * @see        addProductWishlistEntries()
+     * @see        addInterests()
      */
-    public function clearProductWishlistEntries()
+    public function clearInterests()
     {
-        $this->collProductWishlistEntries = null; // important to set this to NULL since that means it is uninitialized
+        $this->collInterests = null; // important to set this to NULL since that means it is uninitialized
     }
 
     /**
-     * Reset is the collProductWishlistEntries collection loaded partially.
+     * Reset is the collInterests collection loaded partially.
      */
-    public function resetPartialProductWishlistEntries($v = true)
+    public function resetPartialInterests($v = true)
     {
-        $this->collProductWishlistEntriesPartial = $v;
+        $this->collInterestsPartial = $v;
     }
 
     /**
-     * Initializes the collProductWishlistEntries collection.
+     * Initializes the collInterests collection.
      *
-     * By default this just sets the collProductWishlistEntries collection to an empty array (like clearcollProductWishlistEntries());
+     * By default this just sets the collInterests collection to an empty array (like clearcollInterests());
      * however, you may wish to override this method in your stub class to provide setting appropriate
      * to your application -- for example, setting the initial array to the values stored in database.
      *
@@ -1160,17 +1101,17 @@ abstract class Product implements ActiveRecordInterface
      *
      * @return void
      */
-    public function initProductWishlistEntries($overrideExisting = true)
+    public function initInterests($overrideExisting = true)
     {
-        if (null !== $this->collProductWishlistEntries && !$overrideExisting) {
+        if (null !== $this->collInterests && !$overrideExisting) {
             return;
         }
-        $this->collProductWishlistEntries = new ObjectCollection();
-        $this->collProductWishlistEntries->setModel('\ProductWishlistEntry');
+        $this->collInterests = new ObjectCollection();
+        $this->collInterests->setModel('\Interest');
     }
 
     /**
-     * Gets an array of ChildProductWishlistEntry objects which contain a foreign key that references this object.
+     * Gets an array of ChildInterest objects which contain a foreign key that references this object.
      *
      * If the $criteria is not null, it is used to always fetch the results from the database.
      * Otherwise the results are fetched from the database the first time, then cached.
@@ -1180,108 +1121,108 @@ abstract class Product implements ActiveRecordInterface
      *
      * @param      Criteria $criteria optional Criteria object to narrow the query
      * @param      ConnectionInterface $con optional connection object
-     * @return ObjectCollection|ChildProductWishlistEntry[] List of ChildProductWishlistEntry objects
+     * @return ObjectCollection|ChildInterest[] List of ChildInterest objects
      * @throws PropelException
      */
-    public function getProductWishlistEntries(Criteria $criteria = null, ConnectionInterface $con = null)
+    public function getInterests(Criteria $criteria = null, ConnectionInterface $con = null)
     {
-        $partial = $this->collProductWishlistEntriesPartial && !$this->isNew();
-        if (null === $this->collProductWishlistEntries || null !== $criteria  || $partial) {
-            if ($this->isNew() && null === $this->collProductWishlistEntries) {
+        $partial = $this->collInterestsPartial && !$this->isNew();
+        if (null === $this->collInterests || null !== $criteria  || $partial) {
+            if ($this->isNew() && null === $this->collInterests) {
                 // return empty collection
-                $this->initProductWishlistEntries();
+                $this->initInterests();
             } else {
-                $collProductWishlistEntries = ChildProductWishlistEntryQuery::create(null, $criteria)
+                $collInterests = ChildInterestQuery::create(null, $criteria)
                     ->filterByProduct($this)
                     ->find($con);
 
                 if (null !== $criteria) {
-                    if (false !== $this->collProductWishlistEntriesPartial && count($collProductWishlistEntries)) {
-                        $this->initProductWishlistEntries(false);
+                    if (false !== $this->collInterestsPartial && count($collInterests)) {
+                        $this->initInterests(false);
 
-                        foreach ($collProductWishlistEntries as $obj) {
-                            if (false == $this->collProductWishlistEntries->contains($obj)) {
-                                $this->collProductWishlistEntries->append($obj);
+                        foreach ($collInterests as $obj) {
+                            if (false == $this->collInterests->contains($obj)) {
+                                $this->collInterests->append($obj);
                             }
                         }
 
-                        $this->collProductWishlistEntriesPartial = true;
+                        $this->collInterestsPartial = true;
                     }
 
-                    return $collProductWishlistEntries;
+                    return $collInterests;
                 }
 
-                if ($partial && $this->collProductWishlistEntries) {
-                    foreach ($this->collProductWishlistEntries as $obj) {
+                if ($partial && $this->collInterests) {
+                    foreach ($this->collInterests as $obj) {
                         if ($obj->isNew()) {
-                            $collProductWishlistEntries[] = $obj;
+                            $collInterests[] = $obj;
                         }
                     }
                 }
 
-                $this->collProductWishlistEntries = $collProductWishlistEntries;
-                $this->collProductWishlistEntriesPartial = false;
+                $this->collInterests = $collInterests;
+                $this->collInterestsPartial = false;
             }
         }
 
-        return $this->collProductWishlistEntries;
+        return $this->collInterests;
     }
 
     /**
-     * Sets a collection of ChildProductWishlistEntry objects related by a one-to-many relationship
+     * Sets a collection of ChildInterest objects related by a one-to-many relationship
      * to the current object.
      * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
      * and new objects from the given Propel collection.
      *
-     * @param      Collection $productWishlistEntries A Propel collection.
+     * @param      Collection $interests A Propel collection.
      * @param      ConnectionInterface $con Optional connection object
      * @return $this|ChildProduct The current object (for fluent API support)
      */
-    public function setProductWishlistEntries(Collection $productWishlistEntries, ConnectionInterface $con = null)
+    public function setInterests(Collection $interests, ConnectionInterface $con = null)
     {
-        /** @var ChildProductWishlistEntry[] $productWishlistEntriesToDelete */
-        $productWishlistEntriesToDelete = $this->getProductWishlistEntries(new Criteria(), $con)->diff($productWishlistEntries);
+        /** @var ChildInterest[] $interestsToDelete */
+        $interestsToDelete = $this->getInterests(new Criteria(), $con)->diff($interests);
 
 
-        $this->productWishlistEntriesScheduledForDeletion = $productWishlistEntriesToDelete;
+        $this->interestsScheduledForDeletion = $interestsToDelete;
 
-        foreach ($productWishlistEntriesToDelete as $productWishlistEntryRemoved) {
-            $productWishlistEntryRemoved->setProduct(null);
+        foreach ($interestsToDelete as $interestRemoved) {
+            $interestRemoved->setProduct(null);
         }
 
-        $this->collProductWishlistEntries = null;
-        foreach ($productWishlistEntries as $productWishlistEntry) {
-            $this->addProductWishlistEntry($productWishlistEntry);
+        $this->collInterests = null;
+        foreach ($interests as $interest) {
+            $this->addInterest($interest);
         }
 
-        $this->collProductWishlistEntries = $productWishlistEntries;
-        $this->collProductWishlistEntriesPartial = false;
+        $this->collInterests = $interests;
+        $this->collInterestsPartial = false;
 
         return $this;
     }
 
     /**
-     * Returns the number of related ProductWishlistEntry objects.
+     * Returns the number of related Interest objects.
      *
      * @param      Criteria $criteria
      * @param      boolean $distinct
      * @param      ConnectionInterface $con
-     * @return int             Count of related ProductWishlistEntry objects.
+     * @return int             Count of related Interest objects.
      * @throws PropelException
      */
-    public function countProductWishlistEntries(Criteria $criteria = null, $distinct = false, ConnectionInterface $con = null)
+    public function countInterests(Criteria $criteria = null, $distinct = false, ConnectionInterface $con = null)
     {
-        $partial = $this->collProductWishlistEntriesPartial && !$this->isNew();
-        if (null === $this->collProductWishlistEntries || null !== $criteria || $partial) {
-            if ($this->isNew() && null === $this->collProductWishlistEntries) {
+        $partial = $this->collInterestsPartial && !$this->isNew();
+        if (null === $this->collInterests || null !== $criteria || $partial) {
+            if ($this->isNew() && null === $this->collInterests) {
                 return 0;
             }
 
             if ($partial && !$criteria) {
-                return count($this->getProductWishlistEntries());
+                return count($this->getInterests());
             }
 
-            $query = ChildProductWishlistEntryQuery::create(null, $criteria);
+            $query = ChildInterestQuery::create(null, $criteria);
             if ($distinct) {
                 $query->distinct();
             }
@@ -1291,54 +1232,54 @@ abstract class Product implements ActiveRecordInterface
                 ->count($con);
         }
 
-        return count($this->collProductWishlistEntries);
+        return count($this->collInterests);
     }
 
     /**
-     * Method called to associate a ChildProductWishlistEntry object to this object
-     * through the ChildProductWishlistEntry foreign key attribute.
+     * Method called to associate a ChildInterest object to this object
+     * through the ChildInterest foreign key attribute.
      *
-     * @param  ChildProductWishlistEntry $l ChildProductWishlistEntry
+     * @param  ChildInterest $l ChildInterest
      * @return $this|\Product The current object (for fluent API support)
      */
-    public function addProductWishlistEntry(ChildProductWishlistEntry $l)
+    public function addInterest(ChildInterest $l)
     {
-        if ($this->collProductWishlistEntries === null) {
-            $this->initProductWishlistEntries();
-            $this->collProductWishlistEntriesPartial = true;
+        if ($this->collInterests === null) {
+            $this->initInterests();
+            $this->collInterestsPartial = true;
         }
 
-        if (!$this->collProductWishlistEntries->contains($l)) {
-            $this->doAddProductWishlistEntry($l);
+        if (!$this->collInterests->contains($l)) {
+            $this->doAddInterest($l);
         }
 
         return $this;
     }
 
     /**
-     * @param ChildProductWishlistEntry $productWishlistEntry The ChildProductWishlistEntry object to add.
+     * @param ChildInterest $interest The ChildInterest object to add.
      */
-    protected function doAddProductWishlistEntry(ChildProductWishlistEntry $productWishlistEntry)
+    protected function doAddInterest(ChildInterest $interest)
     {
-        $this->collProductWishlistEntries[]= $productWishlistEntry;
-        $productWishlistEntry->setProduct($this);
+        $this->collInterests[]= $interest;
+        $interest->setProduct($this);
     }
 
     /**
-     * @param  ChildProductWishlistEntry $productWishlistEntry The ChildProductWishlistEntry object to remove.
+     * @param  ChildInterest $interest The ChildInterest object to remove.
      * @return $this|ChildProduct The current object (for fluent API support)
      */
-    public function removeProductWishlistEntry(ChildProductWishlistEntry $productWishlistEntry)
+    public function removeInterest(ChildInterest $interest)
     {
-        if ($this->getProductWishlistEntries()->contains($productWishlistEntry)) {
-            $pos = $this->collProductWishlistEntries->search($productWishlistEntry);
-            $this->collProductWishlistEntries->remove($pos);
-            if (null === $this->productWishlistEntriesScheduledForDeletion) {
-                $this->productWishlistEntriesScheduledForDeletion = clone $this->collProductWishlistEntries;
-                $this->productWishlistEntriesScheduledForDeletion->clear();
+        if ($this->getInterests()->contains($interest)) {
+            $pos = $this->collInterests->search($interest);
+            $this->collInterests->remove($pos);
+            if (null === $this->interestsScheduledForDeletion) {
+                $this->interestsScheduledForDeletion = clone $this->collInterests;
+                $this->interestsScheduledForDeletion->clear();
             }
-            $this->productWishlistEntriesScheduledForDeletion[]= $productWishlistEntry;
-            $productWishlistEntry->setProduct(null);
+            $this->interestsScheduledForDeletion[]= $interest;
+            $interest->setProduct(null);
         }
 
         return $this;
@@ -1350,7 +1291,7 @@ abstract class Product implements ActiveRecordInterface
      * an identical criteria, it returns the collection.
      * Otherwise if this Product is new, it will return
      * an empty collection; or if this Product has previously
-     * been saved, it will retrieve related ProductWishlistEntries from storage.
+     * been saved, it will retrieve related Interests from storage.
      *
      * This method is protected by default in order to keep the public
      * api reasonable.  You can provide public methods for those you
@@ -1359,14 +1300,14 @@ abstract class Product implements ActiveRecordInterface
      * @param      Criteria $criteria optional Criteria object to narrow the query
      * @param      ConnectionInterface $con optional connection object
      * @param      string $joinBehavior optional join type to use (defaults to Criteria::LEFT_JOIN)
-     * @return ObjectCollection|ChildProductWishlistEntry[] List of ChildProductWishlistEntry objects
+     * @return ObjectCollection|ChildInterest[] List of ChildInterest objects
      */
-    public function getProductWishlistEntriesJoinUser(Criteria $criteria = null, ConnectionInterface $con = null, $joinBehavior = Criteria::LEFT_JOIN)
+    public function getInterestsJoinUser(Criteria $criteria = null, ConnectionInterface $con = null, $joinBehavior = Criteria::LEFT_JOIN)
     {
-        $query = ChildProductWishlistEntryQuery::create(null, $criteria);
+        $query = ChildInterestQuery::create(null, $criteria);
         $query->joinWith('User', $joinBehavior);
 
-        return $this->getProductWishlistEntries($query, $con);
+        return $this->getInterests($query, $con);
     }
 
     /**
@@ -1621,7 +1562,6 @@ abstract class Product implements ActiveRecordInterface
     {
         $this->product_id = null;
         $this->product_name = null;
-        $this->product_price = null;
         $this->alreadyInSave = false;
         $this->clearAllReferences();
         $this->resetModified();
@@ -1640,8 +1580,8 @@ abstract class Product implements ActiveRecordInterface
     public function clearAllReferences($deep = false)
     {
         if ($deep) {
-            if ($this->collProductWishlistEntries) {
-                foreach ($this->collProductWishlistEntries as $o) {
+            if ($this->collInterests) {
+                foreach ($this->collInterests as $o) {
                     $o->clearAllReferences($deep);
                 }
             }
@@ -1652,7 +1592,7 @@ abstract class Product implements ActiveRecordInterface
             }
         } // if ($deep)
 
-        $this->collProductWishlistEntries = null;
+        $this->collInterests = null;
         $this->collSales = null;
     }
 

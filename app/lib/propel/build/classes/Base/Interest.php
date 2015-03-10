@@ -2,14 +2,14 @@
 
 namespace Base;
 
+use \InterestQuery as ChildInterestQuery;
 use \Product as ChildProduct;
 use \ProductQuery as ChildProductQuery;
-use \ProductWishlistEntryQuery as ChildProductWishlistEntryQuery;
 use \User as ChildUser;
 use \UserQuery as ChildUserQuery;
 use \Exception;
 use \PDO;
-use Map\ProductWishlistEntryTableMap;
+use Map\InterestTableMap;
 use Propel\Runtime\Propel;
 use Propel\Runtime\ActiveQuery\Criteria;
 use Propel\Runtime\ActiveQuery\ModelCriteria;
@@ -22,12 +22,12 @@ use Propel\Runtime\Exception\PropelException;
 use Propel\Runtime\Map\TableMap;
 use Propel\Runtime\Parser\AbstractParser;
 
-abstract class ProductWishlistEntry implements ActiveRecordInterface
+abstract class Interest implements ActiveRecordInterface
 {
     /**
      * TableMap class name
      */
-    const TABLE_MAP = '\\Map\\ProductWishlistEntryTableMap';
+    const TABLE_MAP = '\\Map\\InterestTableMap';
 
 
     /**
@@ -57,10 +57,16 @@ abstract class ProductWishlistEntry implements ActiveRecordInterface
     protected $virtualColumns = array();
 
     /**
-     * The value for the product_wishlist_entry_id field.
+     * The value for the interest_id field.
      * @var        string
      */
-    protected $product_wishlist_entry_id;
+    protected $interest_id;
+
+    /**
+     * The value for the max_price field.
+     * @var        string
+     */
+    protected $max_price;
 
     /**
      * The value for the user_id field.
@@ -93,7 +99,7 @@ abstract class ProductWishlistEntry implements ActiveRecordInterface
     protected $alreadyInSave = false;
 
     /**
-     * Initializes internal state of Base\ProductWishlistEntry object.
+     * Initializes internal state of Base\Interest object.
      */
     public function __construct()
     {
@@ -188,9 +194,9 @@ abstract class ProductWishlistEntry implements ActiveRecordInterface
     }
 
     /**
-     * Compares this with another <code>ProductWishlistEntry</code> instance.  If
-     * <code>obj</code> is an instance of <code>ProductWishlistEntry</code>, delegates to
-     * <code>equals(ProductWishlistEntry)</code>.  Otherwise, returns <code>false</code>.
+     * Compares this with another <code>Interest</code> instance.  If
+     * <code>obj</code> is an instance of <code>Interest</code>, delegates to
+     * <code>equals(Interest)</code>.  Otherwise, returns <code>false</code>.
      *
      * @param  mixed   $obj The object to compare to.
      * @return boolean Whether equal to the object specified.
@@ -256,7 +262,7 @@ abstract class ProductWishlistEntry implements ActiveRecordInterface
      * @param string $name  The virtual column name
      * @param mixed  $value The value to give to the virtual column
      *
-     * @return $this|ProductWishlistEntry The current object, for fluid interface
+     * @return $this|Interest The current object, for fluid interface
      */
     public function setVirtualColumn($name, $value)
     {
@@ -310,13 +316,23 @@ abstract class ProductWishlistEntry implements ActiveRecordInterface
     }
 
     /**
-     * Get the [product_wishlist_entry_id] column value.
+     * Get the [interest_id] column value.
      *
      * @return string
      */
-    public function getProductWishlistEntryId()
+    public function getInterestId()
     {
-        return $this->product_wishlist_entry_id;
+        return $this->interest_id;
+    }
+
+    /**
+     * Get the [max_price] column value.
+     *
+     * @return string
+     */
+    public function getMaxPrice()
+    {
+        return $this->max_price;
     }
 
     /**
@@ -375,13 +391,16 @@ abstract class ProductWishlistEntry implements ActiveRecordInterface
     {
         try {
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 0 + $startcol : ProductWishlistEntryTableMap::translateFieldName('ProductWishlistEntryId', TableMap::TYPE_PHPNAME, $indexType)];
-            $this->product_wishlist_entry_id = (null !== $col) ? (string) $col : null;
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 0 + $startcol : InterestTableMap::translateFieldName('InterestId', TableMap::TYPE_PHPNAME, $indexType)];
+            $this->interest_id = (null !== $col) ? (string) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 1 + $startcol : ProductWishlistEntryTableMap::translateFieldName('UserId', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 1 + $startcol : InterestTableMap::translateFieldName('MaxPrice', TableMap::TYPE_PHPNAME, $indexType)];
+            $this->max_price = (null !== $col) ? (string) $col : null;
+
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 2 + $startcol : InterestTableMap::translateFieldName('UserId', TableMap::TYPE_PHPNAME, $indexType)];
             $this->user_id = (null !== $col) ? (string) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 2 + $startcol : ProductWishlistEntryTableMap::translateFieldName('ProductId', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 3 + $startcol : InterestTableMap::translateFieldName('ProductId', TableMap::TYPE_PHPNAME, $indexType)];
             $this->product_id = (null !== $col) ? (string) $col : null;
             $this->resetModified();
 
@@ -391,10 +410,10 @@ abstract class ProductWishlistEntry implements ActiveRecordInterface
                 $this->ensureConsistency();
             }
 
-            return $startcol + 3; // 3 = ProductWishlistEntryTableMap::NUM_HYDRATE_COLUMNS.
+            return $startcol + 4; // 4 = InterestTableMap::NUM_HYDRATE_COLUMNS.
 
         } catch (Exception $e) {
-            throw new PropelException(sprintf('Error populating %s object', '\\ProductWishlistEntry'), 0, $e);
+            throw new PropelException(sprintf('Error populating %s object', '\\Interest'), 0, $e);
         }
     }
 
@@ -422,30 +441,50 @@ abstract class ProductWishlistEntry implements ActiveRecordInterface
     } // ensureConsistency
 
     /**
-     * Set the value of [product_wishlist_entry_id] column.
+     * Set the value of [interest_id] column.
      *
      * @param  string $v new value
-     * @return $this|\ProductWishlistEntry The current object (for fluent API support)
+     * @return $this|\Interest The current object (for fluent API support)
      */
-    public function setProductWishlistEntryId($v)
+    public function setInterestId($v)
     {
         if ($v !== null) {
             $v = (string) $v;
         }
 
-        if ($this->product_wishlist_entry_id !== $v) {
-            $this->product_wishlist_entry_id = $v;
-            $this->modifiedColumns[ProductWishlistEntryTableMap::COL_PRODUCT_WISHLIST_ENTRY_ID] = true;
+        if ($this->interest_id !== $v) {
+            $this->interest_id = $v;
+            $this->modifiedColumns[InterestTableMap::COL_INTEREST_ID] = true;
         }
 
         return $this;
-    } // setProductWishlistEntryId()
+    } // setInterestId()
+
+    /**
+     * Set the value of [max_price] column.
+     *
+     * @param  string $v new value
+     * @return $this|\Interest The current object (for fluent API support)
+     */
+    public function setMaxPrice($v)
+    {
+        if ($v !== null) {
+            $v = (string) $v;
+        }
+
+        if ($this->max_price !== $v) {
+            $this->max_price = $v;
+            $this->modifiedColumns[InterestTableMap::COL_MAX_PRICE] = true;
+        }
+
+        return $this;
+    } // setMaxPrice()
 
     /**
      * Set the value of [user_id] column.
      *
      * @param  string $v new value
-     * @return $this|\ProductWishlistEntry The current object (for fluent API support)
+     * @return $this|\Interest The current object (for fluent API support)
      */
     public function setUserId($v)
     {
@@ -455,7 +494,7 @@ abstract class ProductWishlistEntry implements ActiveRecordInterface
 
         if ($this->user_id !== $v) {
             $this->user_id = $v;
-            $this->modifiedColumns[ProductWishlistEntryTableMap::COL_USER_ID] = true;
+            $this->modifiedColumns[InterestTableMap::COL_USER_ID] = true;
         }
 
         if ($this->aUser !== null && $this->aUser->getUserId() !== $v) {
@@ -469,7 +508,7 @@ abstract class ProductWishlistEntry implements ActiveRecordInterface
      * Set the value of [product_id] column.
      *
      * @param  string $v new value
-     * @return $this|\ProductWishlistEntry The current object (for fluent API support)
+     * @return $this|\Interest The current object (for fluent API support)
      */
     public function setProductId($v)
     {
@@ -479,7 +518,7 @@ abstract class ProductWishlistEntry implements ActiveRecordInterface
 
         if ($this->product_id !== $v) {
             $this->product_id = $v;
-            $this->modifiedColumns[ProductWishlistEntryTableMap::COL_PRODUCT_ID] = true;
+            $this->modifiedColumns[InterestTableMap::COL_PRODUCT_ID] = true;
         }
 
         if ($this->aProduct !== null && $this->aProduct->getProductId() !== $v) {
@@ -510,13 +549,13 @@ abstract class ProductWishlistEntry implements ActiveRecordInterface
         }
 
         if ($con === null) {
-            $con = Propel::getServiceContainer()->getReadConnection(ProductWishlistEntryTableMap::DATABASE_NAME);
+            $con = Propel::getServiceContainer()->getReadConnection(InterestTableMap::DATABASE_NAME);
         }
 
         // We don't need to alter the object instance pool; we're just modifying this instance
         // already in the pool.
 
-        $dataFetcher = ChildProductWishlistEntryQuery::create(null, $this->buildPkeyCriteria())->setFormatter(ModelCriteria::FORMAT_STATEMENT)->find($con);
+        $dataFetcher = ChildInterestQuery::create(null, $this->buildPkeyCriteria())->setFormatter(ModelCriteria::FORMAT_STATEMENT)->find($con);
         $row = $dataFetcher->fetch();
         $dataFetcher->close();
         if (!$row) {
@@ -537,8 +576,8 @@ abstract class ProductWishlistEntry implements ActiveRecordInterface
      * @param      ConnectionInterface $con
      * @return void
      * @throws PropelException
-     * @see ProductWishlistEntry::setDeleted()
-     * @see ProductWishlistEntry::isDeleted()
+     * @see Interest::setDeleted()
+     * @see Interest::isDeleted()
      */
     public function delete(ConnectionInterface $con = null)
     {
@@ -547,11 +586,11 @@ abstract class ProductWishlistEntry implements ActiveRecordInterface
         }
 
         if ($con === null) {
-            $con = Propel::getServiceContainer()->getWriteConnection(ProductWishlistEntryTableMap::DATABASE_NAME);
+            $con = Propel::getServiceContainer()->getWriteConnection(InterestTableMap::DATABASE_NAME);
         }
 
         $con->transaction(function () use ($con) {
-            $deleteQuery = ChildProductWishlistEntryQuery::create()
+            $deleteQuery = ChildInterestQuery::create()
                 ->filterByPrimaryKey($this->getPrimaryKey());
             $ret = $this->preDelete($con);
             if ($ret) {
@@ -582,7 +621,7 @@ abstract class ProductWishlistEntry implements ActiveRecordInterface
         }
 
         if ($con === null) {
-            $con = Propel::getServiceContainer()->getWriteConnection(ProductWishlistEntryTableMap::DATABASE_NAME);
+            $con = Propel::getServiceContainer()->getWriteConnection(InterestTableMap::DATABASE_NAME);
         }
 
         return $con->transaction(function () use ($con) {
@@ -601,7 +640,7 @@ abstract class ProductWishlistEntry implements ActiveRecordInterface
                     $this->postUpdate($con);
                 }
                 $this->postSave($con);
-                ProductWishlistEntryTableMap::addInstanceToPool($this);
+                InterestTableMap::addInstanceToPool($this);
             } else {
                 $affectedRows = 0;
             }
@@ -677,24 +716,27 @@ abstract class ProductWishlistEntry implements ActiveRecordInterface
         $modifiedColumns = array();
         $index = 0;
 
-        $this->modifiedColumns[ProductWishlistEntryTableMap::COL_PRODUCT_WISHLIST_ENTRY_ID] = true;
-        if (null !== $this->product_wishlist_entry_id) {
-            throw new PropelException('Cannot insert a value for auto-increment primary key (' . ProductWishlistEntryTableMap::COL_PRODUCT_WISHLIST_ENTRY_ID . ')');
+        $this->modifiedColumns[InterestTableMap::COL_INTEREST_ID] = true;
+        if (null !== $this->interest_id) {
+            throw new PropelException('Cannot insert a value for auto-increment primary key (' . InterestTableMap::COL_INTEREST_ID . ')');
         }
 
          // check the columns in natural order for more readable SQL queries
-        if ($this->isColumnModified(ProductWishlistEntryTableMap::COL_PRODUCT_WISHLIST_ENTRY_ID)) {
-            $modifiedColumns[':p' . $index++]  = 'PRODUCT_WISHLIST_ENTRY_ID';
+        if ($this->isColumnModified(InterestTableMap::COL_INTEREST_ID)) {
+            $modifiedColumns[':p' . $index++]  = 'INTEREST_ID';
         }
-        if ($this->isColumnModified(ProductWishlistEntryTableMap::COL_USER_ID)) {
+        if ($this->isColumnModified(InterestTableMap::COL_MAX_PRICE)) {
+            $modifiedColumns[':p' . $index++]  = 'MAX_PRICE';
+        }
+        if ($this->isColumnModified(InterestTableMap::COL_USER_ID)) {
             $modifiedColumns[':p' . $index++]  = 'USER_ID';
         }
-        if ($this->isColumnModified(ProductWishlistEntryTableMap::COL_PRODUCT_ID)) {
+        if ($this->isColumnModified(InterestTableMap::COL_PRODUCT_ID)) {
             $modifiedColumns[':p' . $index++]  = 'PRODUCT_ID';
         }
 
         $sql = sprintf(
-            'INSERT INTO product_wishlist_entry (%s) VALUES (%s)',
+            'INSERT INTO interest (%s) VALUES (%s)',
             implode(', ', $modifiedColumns),
             implode(', ', array_keys($modifiedColumns))
         );
@@ -703,8 +745,11 @@ abstract class ProductWishlistEntry implements ActiveRecordInterface
             $stmt = $con->prepare($sql);
             foreach ($modifiedColumns as $identifier => $columnName) {
                 switch ($columnName) {
-                    case 'PRODUCT_WISHLIST_ENTRY_ID':
-                        $stmt->bindValue($identifier, $this->product_wishlist_entry_id, PDO::PARAM_INT);
+                    case 'INTEREST_ID':
+                        $stmt->bindValue($identifier, $this->interest_id, PDO::PARAM_INT);
+                        break;
+                    case 'MAX_PRICE':
+                        $stmt->bindValue($identifier, $this->max_price, PDO::PARAM_STR);
                         break;
                     case 'USER_ID':
                         $stmt->bindValue($identifier, $this->user_id, PDO::PARAM_INT);
@@ -725,7 +770,7 @@ abstract class ProductWishlistEntry implements ActiveRecordInterface
         } catch (Exception $e) {
             throw new PropelException('Unable to get autoincrement id.', 0, $e);
         }
-        $this->setProductWishlistEntryId($pk);
+        $this->setInterestId($pk);
 
         $this->setNew(false);
     }
@@ -758,7 +803,7 @@ abstract class ProductWishlistEntry implements ActiveRecordInterface
      */
     public function getByName($name, $type = TableMap::TYPE_PHPNAME)
     {
-        $pos = ProductWishlistEntryTableMap::translateFieldName($name, $type, TableMap::TYPE_NUM);
+        $pos = InterestTableMap::translateFieldName($name, $type, TableMap::TYPE_NUM);
         $field = $this->getByPosition($pos);
 
         return $field;
@@ -775,12 +820,15 @@ abstract class ProductWishlistEntry implements ActiveRecordInterface
     {
         switch ($pos) {
             case 0:
-                return $this->getProductWishlistEntryId();
+                return $this->getInterestId();
                 break;
             case 1:
-                return $this->getUserId();
+                return $this->getMaxPrice();
                 break;
             case 2:
+                return $this->getUserId();
+                break;
+            case 3:
                 return $this->getProductId();
                 break;
             default:
@@ -806,15 +854,16 @@ abstract class ProductWishlistEntry implements ActiveRecordInterface
      */
     public function toArray($keyType = TableMap::TYPE_PHPNAME, $includeLazyLoadColumns = true, $alreadyDumpedObjects = array(), $includeForeignObjects = false)
     {
-        if (isset($alreadyDumpedObjects['ProductWishlistEntry'][$this->getPrimaryKey()])) {
+        if (isset($alreadyDumpedObjects['Interest'][$this->getPrimaryKey()])) {
             return '*RECURSION*';
         }
-        $alreadyDumpedObjects['ProductWishlistEntry'][$this->getPrimaryKey()] = true;
-        $keys = ProductWishlistEntryTableMap::getFieldNames($keyType);
+        $alreadyDumpedObjects['Interest'][$this->getPrimaryKey()] = true;
+        $keys = InterestTableMap::getFieldNames($keyType);
         $result = array(
-            $keys[0] => $this->getProductWishlistEntryId(),
-            $keys[1] => $this->getUserId(),
-            $keys[2] => $this->getProductId(),
+            $keys[0] => $this->getInterestId(),
+            $keys[1] => $this->getMaxPrice(),
+            $keys[2] => $this->getUserId(),
+            $keys[3] => $this->getProductId(),
         );
         $virtualColumns = $this->virtualColumns;
         foreach ($virtualColumns as $key => $virtualColumn) {
@@ -842,11 +891,11 @@ abstract class ProductWishlistEntry implements ActiveRecordInterface
      *                one of the class type constants TableMap::TYPE_PHPNAME, TableMap::TYPE_STUDLYPHPNAME
      *                TableMap::TYPE_COLNAME, TableMap::TYPE_FIELDNAME, TableMap::TYPE_NUM.
      *                Defaults to TableMap::TYPE_PHPNAME.
-     * @return $this|\ProductWishlistEntry
+     * @return $this|\Interest
      */
     public function setByName($name, $value, $type = TableMap::TYPE_PHPNAME)
     {
-        $pos = ProductWishlistEntryTableMap::translateFieldName($name, $type, TableMap::TYPE_NUM);
+        $pos = InterestTableMap::translateFieldName($name, $type, TableMap::TYPE_NUM);
 
         return $this->setByPosition($pos, $value);
     }
@@ -857,18 +906,21 @@ abstract class ProductWishlistEntry implements ActiveRecordInterface
      *
      * @param  int $pos position in xml schema
      * @param  mixed $value field value
-     * @return $this|\ProductWishlistEntry
+     * @return $this|\Interest
      */
     public function setByPosition($pos, $value)
     {
         switch ($pos) {
             case 0:
-                $this->setProductWishlistEntryId($value);
+                $this->setInterestId($value);
                 break;
             case 1:
-                $this->setUserId($value);
+                $this->setMaxPrice($value);
                 break;
             case 2:
+                $this->setUserId($value);
+                break;
+            case 3:
                 $this->setProductId($value);
                 break;
         } // switch()
@@ -895,16 +947,19 @@ abstract class ProductWishlistEntry implements ActiveRecordInterface
      */
     public function fromArray($arr, $keyType = TableMap::TYPE_PHPNAME)
     {
-        $keys = ProductWishlistEntryTableMap::getFieldNames($keyType);
+        $keys = InterestTableMap::getFieldNames($keyType);
 
         if (array_key_exists($keys[0], $arr)) {
-            $this->setProductWishlistEntryId($arr[$keys[0]]);
+            $this->setInterestId($arr[$keys[0]]);
         }
         if (array_key_exists($keys[1], $arr)) {
-            $this->setUserId($arr[$keys[1]]);
+            $this->setMaxPrice($arr[$keys[1]]);
         }
         if (array_key_exists($keys[2], $arr)) {
-            $this->setProductId($arr[$keys[2]]);
+            $this->setUserId($arr[$keys[2]]);
+        }
+        if (array_key_exists($keys[3], $arr)) {
+            $this->setProductId($arr[$keys[3]]);
         }
     }
 
@@ -919,7 +974,7 @@ abstract class ProductWishlistEntry implements ActiveRecordInterface
      *                       or a format name ('XML', 'YAML', 'JSON', 'CSV')
      * @param string $data The source data to import from
      *
-     * @return $this|\ProductWishlistEntry The current object, for fluid interface
+     * @return $this|\Interest The current object, for fluid interface
      */
     public function importFrom($parser, $data)
     {
@@ -939,16 +994,19 @@ abstract class ProductWishlistEntry implements ActiveRecordInterface
      */
     public function buildCriteria()
     {
-        $criteria = new Criteria(ProductWishlistEntryTableMap::DATABASE_NAME);
+        $criteria = new Criteria(InterestTableMap::DATABASE_NAME);
 
-        if ($this->isColumnModified(ProductWishlistEntryTableMap::COL_PRODUCT_WISHLIST_ENTRY_ID)) {
-            $criteria->add(ProductWishlistEntryTableMap::COL_PRODUCT_WISHLIST_ENTRY_ID, $this->product_wishlist_entry_id);
+        if ($this->isColumnModified(InterestTableMap::COL_INTEREST_ID)) {
+            $criteria->add(InterestTableMap::COL_INTEREST_ID, $this->interest_id);
         }
-        if ($this->isColumnModified(ProductWishlistEntryTableMap::COL_USER_ID)) {
-            $criteria->add(ProductWishlistEntryTableMap::COL_USER_ID, $this->user_id);
+        if ($this->isColumnModified(InterestTableMap::COL_MAX_PRICE)) {
+            $criteria->add(InterestTableMap::COL_MAX_PRICE, $this->max_price);
         }
-        if ($this->isColumnModified(ProductWishlistEntryTableMap::COL_PRODUCT_ID)) {
-            $criteria->add(ProductWishlistEntryTableMap::COL_PRODUCT_ID, $this->product_id);
+        if ($this->isColumnModified(InterestTableMap::COL_USER_ID)) {
+            $criteria->add(InterestTableMap::COL_USER_ID, $this->user_id);
+        }
+        if ($this->isColumnModified(InterestTableMap::COL_PRODUCT_ID)) {
+            $criteria->add(InterestTableMap::COL_PRODUCT_ID, $this->product_id);
         }
 
         return $criteria;
@@ -966,8 +1024,8 @@ abstract class ProductWishlistEntry implements ActiveRecordInterface
      */
     public function buildPkeyCriteria()
     {
-        $criteria = new Criteria(ProductWishlistEntryTableMap::DATABASE_NAME);
-        $criteria->add(ProductWishlistEntryTableMap::COL_PRODUCT_WISHLIST_ENTRY_ID, $this->product_wishlist_entry_id);
+        $criteria = new Criteria(InterestTableMap::DATABASE_NAME);
+        $criteria->add(InterestTableMap::COL_INTEREST_ID, $this->interest_id);
 
         return $criteria;
     }
@@ -980,7 +1038,7 @@ abstract class ProductWishlistEntry implements ActiveRecordInterface
      */
     public function hashCode()
     {
-        $validPk = null !== $this->getProductWishlistEntryId();
+        $validPk = null !== $this->getInterestId();
 
         $validPrimaryKeyFKs = 0;
         $primaryKeyFKs = [];
@@ -1000,18 +1058,18 @@ abstract class ProductWishlistEntry implements ActiveRecordInterface
      */
     public function getPrimaryKey()
     {
-        return $this->getProductWishlistEntryId();
+        return $this->getInterestId();
     }
 
     /**
-     * Generic method to set the primary key (product_wishlist_entry_id column).
+     * Generic method to set the primary key (interest_id column).
      *
      * @param       string $key Primary key.
      * @return void
      */
     public function setPrimaryKey($key)
     {
-        $this->setProductWishlistEntryId($key);
+        $this->setInterestId($key);
     }
 
     /**
@@ -1020,7 +1078,7 @@ abstract class ProductWishlistEntry implements ActiveRecordInterface
      */
     public function isPrimaryKeyNull()
     {
-        return null === $this->getProductWishlistEntryId();
+        return null === $this->getInterestId();
     }
 
     /**
@@ -1029,18 +1087,19 @@ abstract class ProductWishlistEntry implements ActiveRecordInterface
      * If desired, this method can also make copies of all associated (fkey referrers)
      * objects.
      *
-     * @param      object $copyObj An object of \ProductWishlistEntry (or compatible) type.
+     * @param      object $copyObj An object of \Interest (or compatible) type.
      * @param      boolean $deepCopy Whether to also copy all rows that refer (by fkey) to the current row.
      * @param      boolean $makeNew Whether to reset autoincrement PKs and make the object new.
      * @throws PropelException
      */
     public function copyInto($copyObj, $deepCopy = false, $makeNew = true)
     {
+        $copyObj->setMaxPrice($this->getMaxPrice());
         $copyObj->setUserId($this->getUserId());
         $copyObj->setProductId($this->getProductId());
         if ($makeNew) {
             $copyObj->setNew(true);
-            $copyObj->setProductWishlistEntryId(NULL); // this is a auto-increment column, so set to default value
+            $copyObj->setInterestId(NULL); // this is a auto-increment column, so set to default value
         }
     }
 
@@ -1053,7 +1112,7 @@ abstract class ProductWishlistEntry implements ActiveRecordInterface
      * objects.
      *
      * @param  boolean $deepCopy Whether to also copy all rows that refer (by fkey) to the current row.
-     * @return \ProductWishlistEntry Clone of current object.
+     * @return \Interest Clone of current object.
      * @throws PropelException
      */
     public function copy($deepCopy = false)
@@ -1070,7 +1129,7 @@ abstract class ProductWishlistEntry implements ActiveRecordInterface
      * Declares an association between this object and a ChildProduct object.
      *
      * @param  ChildProduct $v
-     * @return $this|\ProductWishlistEntry The current object (for fluent API support)
+     * @return $this|\Interest The current object (for fluent API support)
      * @throws PropelException
      */
     public function setProduct(ChildProduct $v = null)
@@ -1086,7 +1145,7 @@ abstract class ProductWishlistEntry implements ActiveRecordInterface
         // Add binding for other direction of this n:n relationship.
         // If this object has already been added to the ChildProduct object, it will not be re-added.
         if ($v !== null) {
-            $v->addProductWishlistEntry($this);
+            $v->addInterest($this);
         }
 
 
@@ -1110,7 +1169,7 @@ abstract class ProductWishlistEntry implements ActiveRecordInterface
                 to this object.  This level of coupling may, however, be
                 undesirable since it could result in an only partially populated collection
                 in the referenced object.
-                $this->aProduct->addProductWishlistEntries($this);
+                $this->aProduct->addInterests($this);
              */
         }
 
@@ -1121,7 +1180,7 @@ abstract class ProductWishlistEntry implements ActiveRecordInterface
      * Declares an association between this object and a ChildUser object.
      *
      * @param  ChildUser $v
-     * @return $this|\ProductWishlistEntry The current object (for fluent API support)
+     * @return $this|\Interest The current object (for fluent API support)
      * @throws PropelException
      */
     public function setUser(ChildUser $v = null)
@@ -1137,7 +1196,7 @@ abstract class ProductWishlistEntry implements ActiveRecordInterface
         // Add binding for other direction of this n:n relationship.
         // If this object has already been added to the ChildUser object, it will not be re-added.
         if ($v !== null) {
-            $v->addProductWishlistEntry($this);
+            $v->addInterest($this);
         }
 
 
@@ -1161,7 +1220,7 @@ abstract class ProductWishlistEntry implements ActiveRecordInterface
                 to this object.  This level of coupling may, however, be
                 undesirable since it could result in an only partially populated collection
                 in the referenced object.
-                $this->aUser->addProductWishlistEntries($this);
+                $this->aUser->addInterests($this);
              */
         }
 
@@ -1176,12 +1235,13 @@ abstract class ProductWishlistEntry implements ActiveRecordInterface
     public function clear()
     {
         if (null !== $this->aProduct) {
-            $this->aProduct->removeProductWishlistEntry($this);
+            $this->aProduct->removeInterest($this);
         }
         if (null !== $this->aUser) {
-            $this->aUser->removeProductWishlistEntry($this);
+            $this->aUser->removeInterest($this);
         }
-        $this->product_wishlist_entry_id = null;
+        $this->interest_id = null;
+        $this->max_price = null;
         $this->user_id = null;
         $this->product_id = null;
         $this->alreadyInSave = false;
@@ -1215,7 +1275,7 @@ abstract class ProductWishlistEntry implements ActiveRecordInterface
      */
     public function __toString()
     {
-        return (string) $this->exportTo(ProductWishlistEntryTableMap::DEFAULT_STRING_FORMAT);
+        return (string) $this->exportTo(InterestTableMap::DEFAULT_STRING_FORMAT);
     }
 
     /**

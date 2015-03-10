@@ -67,6 +67,12 @@ abstract class Sale implements ActiveRecordInterface
     protected $sale_id;
 
     /**
+     * The value for the price field.
+     * @var        string
+     */
+    protected $price;
+
+    /**
      * The value for the location field.
      * @var        string
      */
@@ -342,6 +348,16 @@ abstract class Sale implements ActiveRecordInterface
     }
 
     /**
+     * Get the [price] column value.
+     *
+     * @return string
+     */
+    public function getPrice()
+    {
+        return $this->price;
+    }
+
+    /**
      * Get the [location] column value.
      *
      * @return string
@@ -410,13 +426,16 @@ abstract class Sale implements ActiveRecordInterface
             $col = $row[TableMap::TYPE_NUM == $indexType ? 0 + $startcol : SaleTableMap::translateFieldName('SaleId', TableMap::TYPE_PHPNAME, $indexType)];
             $this->sale_id = (null !== $col) ? (string) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 1 + $startcol : SaleTableMap::translateFieldName('Location', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 1 + $startcol : SaleTableMap::translateFieldName('Price', TableMap::TYPE_PHPNAME, $indexType)];
+            $this->price = (null !== $col) ? (string) $col : null;
+
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 2 + $startcol : SaleTableMap::translateFieldName('Location', TableMap::TYPE_PHPNAME, $indexType)];
             $this->location = (null !== $col) ? (string) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 2 + $startcol : SaleTableMap::translateFieldName('UserId', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 3 + $startcol : SaleTableMap::translateFieldName('UserId', TableMap::TYPE_PHPNAME, $indexType)];
             $this->user_id = (null !== $col) ? (string) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 3 + $startcol : SaleTableMap::translateFieldName('ProductId', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 4 + $startcol : SaleTableMap::translateFieldName('ProductId', TableMap::TYPE_PHPNAME, $indexType)];
             $this->product_id = (null !== $col) ? (string) $col : null;
             $this->resetModified();
 
@@ -426,7 +445,7 @@ abstract class Sale implements ActiveRecordInterface
                 $this->ensureConsistency();
             }
 
-            return $startcol + 4; // 4 = SaleTableMap::NUM_HYDRATE_COLUMNS.
+            return $startcol + 5; // 5 = SaleTableMap::NUM_HYDRATE_COLUMNS.
 
         } catch (Exception $e) {
             throw new PropelException(sprintf('Error populating %s object', '\\Sale'), 0, $e);
@@ -475,6 +494,26 @@ abstract class Sale implements ActiveRecordInterface
 
         return $this;
     } // setSaleId()
+
+    /**
+     * Set the value of [price] column.
+     *
+     * @param  string $v new value
+     * @return $this|\Sale The current object (for fluent API support)
+     */
+    public function setPrice($v)
+    {
+        if ($v !== null) {
+            $v = (string) $v;
+        }
+
+        if ($this->price !== $v) {
+            $this->price = $v;
+            $this->modifiedColumns[SaleTableMap::COL_PRICE] = true;
+        }
+
+        return $this;
+    } // setPrice()
 
     /**
      * Set the value of [location] column.
@@ -761,6 +800,9 @@ abstract class Sale implements ActiveRecordInterface
         if ($this->isColumnModified(SaleTableMap::COL_SALE_ID)) {
             $modifiedColumns[':p' . $index++]  = 'SALE_ID';
         }
+        if ($this->isColumnModified(SaleTableMap::COL_PRICE)) {
+            $modifiedColumns[':p' . $index++]  = 'PRICE';
+        }
         if ($this->isColumnModified(SaleTableMap::COL_LOCATION)) {
             $modifiedColumns[':p' . $index++]  = 'LOCATION';
         }
@@ -783,6 +825,9 @@ abstract class Sale implements ActiveRecordInterface
                 switch ($columnName) {
                     case 'SALE_ID':
                         $stmt->bindValue($identifier, $this->sale_id, PDO::PARAM_INT);
+                        break;
+                    case 'PRICE':
+                        $stmt->bindValue($identifier, $this->price, PDO::PARAM_STR);
                         break;
                     case 'LOCATION':
                         $stmt->bindValue($identifier, $this->location, PDO::PARAM_STR);
@@ -859,12 +904,15 @@ abstract class Sale implements ActiveRecordInterface
                 return $this->getSaleId();
                 break;
             case 1:
-                return $this->getLocation();
+                return $this->getPrice();
                 break;
             case 2:
-                return $this->getUserId();
+                return $this->getLocation();
                 break;
             case 3:
+                return $this->getUserId();
+                break;
+            case 4:
                 return $this->getProductId();
                 break;
             default:
@@ -897,9 +945,10 @@ abstract class Sale implements ActiveRecordInterface
         $keys = SaleTableMap::getFieldNames($keyType);
         $result = array(
             $keys[0] => $this->getSaleId(),
-            $keys[1] => $this->getLocation(),
-            $keys[2] => $this->getUserId(),
-            $keys[3] => $this->getProductId(),
+            $keys[1] => $this->getPrice(),
+            $keys[2] => $this->getLocation(),
+            $keys[3] => $this->getUserId(),
+            $keys[4] => $this->getProductId(),
         );
         $virtualColumns = $this->virtualColumns;
         foreach ($virtualColumns as $key => $virtualColumn) {
@@ -954,12 +1003,15 @@ abstract class Sale implements ActiveRecordInterface
                 $this->setSaleId($value);
                 break;
             case 1:
-                $this->setLocation($value);
+                $this->setPrice($value);
                 break;
             case 2:
-                $this->setUserId($value);
+                $this->setLocation($value);
                 break;
             case 3:
+                $this->setUserId($value);
+                break;
+            case 4:
                 $this->setProductId($value);
                 break;
         } // switch()
@@ -992,13 +1044,16 @@ abstract class Sale implements ActiveRecordInterface
             $this->setSaleId($arr[$keys[0]]);
         }
         if (array_key_exists($keys[1], $arr)) {
-            $this->setLocation($arr[$keys[1]]);
+            $this->setPrice($arr[$keys[1]]);
         }
         if (array_key_exists($keys[2], $arr)) {
-            $this->setUserId($arr[$keys[2]]);
+            $this->setLocation($arr[$keys[2]]);
         }
         if (array_key_exists($keys[3], $arr)) {
-            $this->setProductId($arr[$keys[3]]);
+            $this->setUserId($arr[$keys[3]]);
+        }
+        if (array_key_exists($keys[4], $arr)) {
+            $this->setProductId($arr[$keys[4]]);
         }
     }
 
@@ -1037,6 +1092,9 @@ abstract class Sale implements ActiveRecordInterface
 
         if ($this->isColumnModified(SaleTableMap::COL_SALE_ID)) {
             $criteria->add(SaleTableMap::COL_SALE_ID, $this->sale_id);
+        }
+        if ($this->isColumnModified(SaleTableMap::COL_PRICE)) {
+            $criteria->add(SaleTableMap::COL_PRICE, $this->price);
         }
         if ($this->isColumnModified(SaleTableMap::COL_LOCATION)) {
             $criteria->add(SaleTableMap::COL_LOCATION, $this->location);
@@ -1133,6 +1191,7 @@ abstract class Sale implements ActiveRecordInterface
      */
     public function copyInto($copyObj, $deepCopy = false, $makeNew = true)
     {
+        $copyObj->setPrice($this->getPrice());
         $copyObj->setLocation($this->getLocation());
         $copyObj->setUserId($this->getUserId());
         $copyObj->setProductId($this->getProductId());
@@ -1578,6 +1637,7 @@ abstract class Sale implements ActiveRecordInterface
             $this->aUser->removeSale($this);
         }
         $this->sale_id = null;
+        $this->price = null;
         $this->location = null;
         $this->user_id = null;
         $this->product_id = null;

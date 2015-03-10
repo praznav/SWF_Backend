@@ -59,7 +59,7 @@ class SaleTableMap extends TableMap
     /**
      * The total number of columns
      */
-    const NUM_COLUMNS = 4;
+    const NUM_COLUMNS = 5;
 
     /**
      * The number of lazy-loaded columns
@@ -69,12 +69,17 @@ class SaleTableMap extends TableMap
     /**
      * The number of columns to hydrate (NUM_COLUMNS - NUM_LAZY_LOAD_COLUMNS)
      */
-    const NUM_HYDRATE_COLUMNS = 4;
+    const NUM_HYDRATE_COLUMNS = 5;
 
     /**
      * the column name for the SALE_ID field
      */
     const COL_SALE_ID = 'sale.SALE_ID';
+
+    /**
+     * the column name for the PRICE field
+     */
+    const COL_PRICE = 'sale.PRICE';
 
     /**
      * the column name for the LOCATION field
@@ -103,12 +108,12 @@ class SaleTableMap extends TableMap
      * e.g. self::$fieldNames[self::TYPE_PHPNAME][0] = 'Id'
      */
     protected static $fieldNames = array (
-        self::TYPE_PHPNAME       => array('SaleId', 'Location', 'UserId', 'ProductId', ),
-        self::TYPE_STUDLYPHPNAME => array('saleId', 'location', 'userId', 'productId', ),
-        self::TYPE_COLNAME       => array(SaleTableMap::COL_SALE_ID, SaleTableMap::COL_LOCATION, SaleTableMap::COL_USER_ID, SaleTableMap::COL_PRODUCT_ID, ),
-        self::TYPE_RAW_COLNAME   => array('COL_SALE_ID', 'COL_LOCATION', 'COL_USER_ID', 'COL_PRODUCT_ID', ),
-        self::TYPE_FIELDNAME     => array('sale_id', 'location', 'user_id', 'product_id', ),
-        self::TYPE_NUM           => array(0, 1, 2, 3, )
+        self::TYPE_PHPNAME       => array('SaleId', 'Price', 'Location', 'UserId', 'ProductId', ),
+        self::TYPE_STUDLYPHPNAME => array('saleId', 'price', 'location', 'userId', 'productId', ),
+        self::TYPE_COLNAME       => array(SaleTableMap::COL_SALE_ID, SaleTableMap::COL_PRICE, SaleTableMap::COL_LOCATION, SaleTableMap::COL_USER_ID, SaleTableMap::COL_PRODUCT_ID, ),
+        self::TYPE_RAW_COLNAME   => array('COL_SALE_ID', 'COL_PRICE', 'COL_LOCATION', 'COL_USER_ID', 'COL_PRODUCT_ID', ),
+        self::TYPE_FIELDNAME     => array('sale_id', 'price', 'location', 'user_id', 'product_id', ),
+        self::TYPE_NUM           => array(0, 1, 2, 3, 4, )
     );
 
     /**
@@ -118,12 +123,12 @@ class SaleTableMap extends TableMap
      * e.g. self::$fieldKeys[self::TYPE_PHPNAME]['Id'] = 0
      */
     protected static $fieldKeys = array (
-        self::TYPE_PHPNAME       => array('SaleId' => 0, 'Location' => 1, 'UserId' => 2, 'ProductId' => 3, ),
-        self::TYPE_STUDLYPHPNAME => array('saleId' => 0, 'location' => 1, 'userId' => 2, 'productId' => 3, ),
-        self::TYPE_COLNAME       => array(SaleTableMap::COL_SALE_ID => 0, SaleTableMap::COL_LOCATION => 1, SaleTableMap::COL_USER_ID => 2, SaleTableMap::COL_PRODUCT_ID => 3, ),
-        self::TYPE_RAW_COLNAME   => array('COL_SALE_ID' => 0, 'COL_LOCATION' => 1, 'COL_USER_ID' => 2, 'COL_PRODUCT_ID' => 3, ),
-        self::TYPE_FIELDNAME     => array('sale_id' => 0, 'location' => 1, 'user_id' => 2, 'product_id' => 3, ),
-        self::TYPE_NUM           => array(0, 1, 2, 3, )
+        self::TYPE_PHPNAME       => array('SaleId' => 0, 'Price' => 1, 'Location' => 2, 'UserId' => 3, 'ProductId' => 4, ),
+        self::TYPE_STUDLYPHPNAME => array('saleId' => 0, 'price' => 1, 'location' => 2, 'userId' => 3, 'productId' => 4, ),
+        self::TYPE_COLNAME       => array(SaleTableMap::COL_SALE_ID => 0, SaleTableMap::COL_PRICE => 1, SaleTableMap::COL_LOCATION => 2, SaleTableMap::COL_USER_ID => 3, SaleTableMap::COL_PRODUCT_ID => 4, ),
+        self::TYPE_RAW_COLNAME   => array('COL_SALE_ID' => 0, 'COL_PRICE' => 1, 'COL_LOCATION' => 2, 'COL_USER_ID' => 3, 'COL_PRODUCT_ID' => 4, ),
+        self::TYPE_FIELDNAME     => array('sale_id' => 0, 'price' => 1, 'location' => 2, 'user_id' => 3, 'product_id' => 4, ),
+        self::TYPE_NUM           => array(0, 1, 2, 3, 4, )
     );
 
     /**
@@ -143,6 +148,7 @@ class SaleTableMap extends TableMap
         $this->setUseIdGenerator(true);
         // columns
         $this->addPrimaryKey('SALE_ID', 'SaleId', 'BIGINT', true, null, null);
+        $this->addColumn('PRICE', 'Price', 'DECIMAL', true, 12, null);
         $this->addColumn('LOCATION', 'Location', 'VARCHAR', true, 50, null);
         $this->addForeignKey('USER_ID', 'UserId', 'BIGINT', 'user', 'USER_ID', false, null, null);
         $this->addForeignKey('PRODUCT_ID', 'ProductId', 'BIGINT', 'product', 'PRODUCT_ID', false, null, null);
@@ -300,11 +306,13 @@ class SaleTableMap extends TableMap
     {
         if (null === $alias) {
             $criteria->addSelectColumn(SaleTableMap::COL_SALE_ID);
+            $criteria->addSelectColumn(SaleTableMap::COL_PRICE);
             $criteria->addSelectColumn(SaleTableMap::COL_LOCATION);
             $criteria->addSelectColumn(SaleTableMap::COL_USER_ID);
             $criteria->addSelectColumn(SaleTableMap::COL_PRODUCT_ID);
         } else {
             $criteria->addSelectColumn($alias . '.SALE_ID');
+            $criteria->addSelectColumn($alias . '.PRICE');
             $criteria->addSelectColumn($alias . '.LOCATION');
             $criteria->addSelectColumn($alias . '.USER_ID');
             $criteria->addSelectColumn($alias . '.PRODUCT_ID');

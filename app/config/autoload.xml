@@ -28,12 +28,12 @@
 		<autoload name="ProductQuery">%core.lib_dir%/propel/build/classes/ProductQuery.php</autoload>
 		<autoload name="Base\ProductQuery">%core.lib_dir%/propel/build/classes/Base/ProductQuery.php</autoload>
 
-		<autoload name="ProductWishlistEntry">%core.lib_dir%/propel/build/classes/ProductWishlistEntry.php</autoload>
-		<autoload name="Base\ProductWishlistEntry">%core.lib_dir%/propel/build/classes/Base/ProductWishlistEntry.php</autoload>
-		<autoload name="Map\ProductWishlistEntryTableMap">%core.lib_dir%/propel/build/classes/Map/ProductWishlistEntryTableMap.php</autoload>
+		<autoload name="Interest">%core.lib_dir%/propel/build/classes/Interest.php</autoload>
+		<autoload name="Base\Interest">%core.lib_dir%/propel/build/classes/Base/Interest.php</autoload>
+		<autoload name="Map\InterestTableMap">%core.lib_dir%/propel/build/classes/Map/InterestTableMap.php</autoload>
 
-		<autoload name="ProductWishlistEntryQuery">%core.lib_dir%/propel/build/classes/ProductWishlistEntryQuery.php</autoload>
-		<autoload name="Base\ProductWishlistEntryQuery">%core.lib_dir%/propel/build/classes/Base/ProductWishlistEntryQuery.php</autoload>
+		<autoload name="InterestQuery">%core.lib_dir%/propel/build/classes/InterestQuery.php</autoload>
+		<autoload name="Base\InterestQuery">%core.lib_dir%/propel/build/classes/Base/InterestQuery.php</autoload>
 
         <autoload name="Sale">%core.lib_dir%/propel/build/classes/Sale.php</autoload>
         <autoload name="Base\Sale">%core.lib_dir%/propel/build/classes/Base/Sale.php</autoload>
