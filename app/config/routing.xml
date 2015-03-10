@@ -18,6 +18,8 @@
             </route>
             <route name="Sales" pattern="^/Sales" module="Sales">
                 <route name=".RegisterInterest" pattern="^/RegisterInterest$" action="RegisterInterest" output_type="xml" />
+                <route name=".RegisterSale" pattern="^/RegisterSale$" action="RegisterSale" output_type="xml" />
+                <route name=".Get" pattern="^/Get$" action="Get" output_type="xml" />
             </route>
         
         </routes>
